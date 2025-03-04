@@ -11,7 +11,7 @@ from PySide6.QtCore import QFile, QTextStream, QIODevice
 
 from easydiffraction.calculators.cryspy.parser import Parameter
 from easydiffraction.io.cif import dataBlockToCif
-from easydiffraction.io.cif import cifV2ToV1
+# from easydiffraction.io.cif import cifV2ToV1
 from EasyApp.Logic.Logging import console
 from Logic.Helpers import formatMsg
 
@@ -178,7 +178,7 @@ class Project(QObject):
 
     @Property(bool, notify=needSaveChanged)
     def needSave(self):
-        return self._needSave and self._isExample == False
+        return self._needSave and not self._isExample
 
     @needSave.setter
     def needSave(self, newValue):
@@ -276,7 +276,7 @@ class Project(QObject):
 
         stream = QTextStream(file)
         edCif = stream.readAll()
-        cryspyCif = cifV2ToV1(edCif)
+        ## cryspyCif = cifV2ToV1(edCif)
 
         block = cif.read_string(edCif).sole_block()
         self._dataBlock = gemmiObjToEdProject(block)
@@ -414,7 +414,7 @@ class Project(QObject):
         if oldValue == value:
             return False
         self._dataBlock['params'][category][name][field] = value
-        if type(value) == float:
+        if isinstance(value, float):
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{blockType}.{category}.{name}.{field}'))
         else:
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{blockType}.{category}.{name}.{field}'))

@@ -250,26 +250,26 @@ class Summary(QObject):
             dataBlocksCifList.append(blockCifNoMeas)
             for dataBlock in cryspyObj.items:
                 if dataBlock.data_name == block['name']['value']:
-                    if type(dataBlock) == cryspy.E_data_classes.cl_2_pd.Pd:
+                    if isinstance(dataBlock, cryspy.E_data_classes.cl_2_pd.Pd):
                         for subBlock in dataBlock.items:
-                                if type(subBlock) == cryspy.C_item_loop_classes.cl_1_pd_peak.PdPeakL:
+                                if isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_peak.PdPeakL):
                                     cif = subBlock.to_cif()
                                     dataBlocksCifList.append(cif)
-                                elif type(subBlock) == cryspy.C_item_loop_classes.cl_1_pd_proc.PdProcL:
+                                elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_proc.PdProcL):
                                     cif = subBlock.to_cif()
                                     dataBlocksCifList.append(cif)
-                                elif type(subBlock) == cryspy.C_item_loop_classes.cl_1_pd_meas.PdMeasL:
+                                elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_meas.PdMeasL):
                                     cif = subBlock.to_cif()
                                     dataBlocksCifList.append(cif)
-                    elif type(dataBlock) == cryspy.E_data_classes.cl_2_tof.TOF:
+                    elif isinstance(dataBlock, cryspy.E_data_classes.cl_2_tof.TOF):
                         for subBlock in dataBlock.items:
-                            if type(subBlock) == cryspy.C_item_loop_classes.cl_1_tof_peak.TOFPeakL:
+                            if isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_tof_peak.TOFPeakL):
                                 cif = subBlock.to_cif()
                                 dataBlocksCifList.append(cif)
-                            elif type(subBlock) == cryspy.C_item_loop_classes.cl_1_tof_proc.TOFProcL:
+                            elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_tof_proc.TOFProcL):
                                 cif = subBlock.to_cif()
                                 dataBlocksCifList.append(cif)
-                            elif type(subBlock) == cryspy.C_item_loop_classes.cl_1_tof_meas.TOFMeasL:
+                            elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_tof_meas.TOFMeasL):
                                 cif = subBlock.to_cif()
                                 dataBlocksCifList.append(cif)
 
@@ -367,7 +367,7 @@ class Summary(QObject):
 
         num_free_params = proxy.fittables.freeParamsCount
         num_fixed_params = proxy.fittables.fixedParamsCount
-        num_params = num_free_params + num_fixed_params
+        # num_params = num_free_params + num_fixed_params
         goodness_of_fit = proxy.status.goodnessOfFit
         goodness_of_fit = goodness_of_fit.split(' → ')[-1]
 

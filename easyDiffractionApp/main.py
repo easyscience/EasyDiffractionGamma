@@ -3,10 +3,10 @@
 # © 2023 Contributors to the EasyDiffraction project <https://github.com/easyscience/EasyDiffraction>
 
 import sys
-EASYAPP_LOCAL_PATH = '../../EasyApp'
-sys.path.append(EASYAPP_LOCAL_PATH)
 from EasyApp.Logic.Logging import console
 
+EASYAPP_LOCAL_PATH = '../../EasyApp'
+sys.path.append(EASYAPP_LOCAL_PATH)
 
 if __name__ == '__main__':
 

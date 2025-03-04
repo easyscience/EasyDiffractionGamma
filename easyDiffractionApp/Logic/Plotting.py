@@ -5,10 +5,10 @@
 import numpy as np
 from PySide6.QtCore import QObject, Signal, Slot, Property, Qt
 from PySide6.QtGui import QImage, QBrush
-from PySide6 import QtCharts
+from PySide6 import QtCharts # noqa: F401
 
 from EasyApp.Logic.Logging import console
-from Logic.Helpers import Converter #, WebEngine
+# from Logic.Helpers import Converter #, WebEngine
 from Logic.Helpers import formatMsg
 
 
@@ -132,9 +132,10 @@ class Plotting(QObject):
         if lib == 'QtCharts':
             self.qtchartsReplaceMeasuredOnExperimentChartAndRedraw()
         elif lib == 'Plotly':
-            self.plotlyReplaceXOnExperimentChart()
-            self.plotlyReplaceMeasuredYOnExperimentChart()
-            self.plotlyRedrawExperimentChart()
+            pass
+            # self.plotlyReplaceXOnExperimentChart()
+            # self.plotlyReplaceMeasuredYOnExperimentChart()
+            # self.plotlyRedrawExperimentChart()
 
     def drawBackgroundOnExperimentChart(self):
         lib = self._proxy.plotting.currentLib1d
@@ -150,8 +151,9 @@ class Plotting(QObject):
         if lib == 'QtCharts':
             self.qtchartsReplaceMeasuredOnAnalysisChartAndRedraw()
         elif lib == 'Plotly':
-            self.plotlyReplaceXOnAnalysisChart()
-            self.plotlyReplaceMeasuredYOnAnalysisChart()
+            # self.plotlyReplaceXOnAnalysisChart()
+            # self.plotlyReplaceMeasuredYOnAnalysisChart()
+            pass
 
     def drawBackgroundOnAnalysisChart(self):
         lib = self._proxy.plotting.currentLib1d
@@ -165,7 +167,8 @@ class Plotting(QObject):
         if lib == 'QtCharts':
             self.qtchartsReplaceTotalCalculatedOnAnalysisChartAndRedraw()
         elif lib == 'Plotly':
-            self.plotlyReplaceTotalCalculatedYOnAnalysisChartAndRedraw()
+            #self.plotlyReplaceTotalCalculatedYOnAnalysisChartAndRedraw()
+            pass
 
     def drawResidualOnAnalysisChart(self):
         lib = self._proxy.plotting.currentLib1d
@@ -274,110 +277,110 @@ class Plotting(QObject):
 
     # Plotly: Experiment
 
-    def plotlyReplaceXOnExperimentChart(self):
-        index = self._proxy.experiment.currentIndex
-        xArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            xArray = self._proxy.experiment._xArrays[index]
-        arrayStr = Converter.dictToJson(xArray)
-        script = f'setXData({arrayStr})'
-        chart = self._chartRefs['Plotly']['experimentPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceXOnExperimentChart(self):
+    #     index = self._proxy.experiment.currentIndex
+    #     xArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         xArray = self._proxy.experiment._xArrays[index]
+    #     arrayStr = Converter.dictToJson(xArray)
+    #     script = f'setXData({arrayStr})'
+    #     chart = self._chartRefs['Plotly']['experimentPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyReplaceMeasuredYOnExperimentChart(self):
-        index = self._proxy.experiment.currentIndex
-        yMeasArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            yMeasArray = self._proxy.experiment._yMeasArrays[index]
-        arrayStr = Converter.dictToJson(yMeasArray)
-        script = f'setMeasuredYData({arrayStr})'
-        chart = self._chartRefs['Plotly']['experimentPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceMeasuredYOnExperimentChart(self):
+    #     index = self._proxy.experiment.currentIndex
+    #     yMeasArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         yMeasArray = self._proxy.experiment._yMeasArrays[index]
+    #     arrayStr = Converter.dictToJson(yMeasArray)
+    #     script = f'setMeasuredYData({arrayStr})'
+    #     chart = self._chartRefs['Plotly']['experimentPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyRedrawExperimentChart(self):
-        chart = self._chartRefs['Plotly']['experimentPage']
-        script = 'redrawPlot()'
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyRedrawExperimentChart(self):
+    #     chart = self._chartRefs['Plotly']['experimentPage']
+    #     script = 'redrawPlot()'
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    # Plotly: Model
+    # # Plotly: Model
 
-    def plotlyReplaceXOnModelChart(self):
-        index = self._proxy.experiment.currentIndex
-        xArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            xArray = self._proxy.experiment._xArrays[index]
-        arrayStr = Converter.dictToJson(xArray)
-        script = f'setXData({arrayStr})'
-        chart = self._chartRefs['Plotly']['modelPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceXOnModelChart(self):
+    #     index = self._proxy.experiment.currentIndex
+    #     xArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         xArray = self._proxy.experiment._xArrays[index]
+    #     arrayStr = Converter.dictToJson(xArray)
+    #     script = f'setXData({arrayStr})'
+    #     chart = self._chartRefs['Plotly']['modelPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyReplaceCalculatedYOnModelChart(self):
-        index = self._proxy.model.currentIndex
-        yCalcArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            yCalcArray = self._proxy.model._yCalcArrays[index]
-        arrayStr = Converter.dictToJson(yCalcArray)
-        script = f'setCalculatedYData({arrayStr})'
-        chart = self._chartRefs['Plotly']['modelPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceCalculatedYOnModelChart(self):
+    #     index = self._proxy.model.currentIndex
+    #     yCalcArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         yCalcArray = self._proxy.model._yCalcArrays[index]
+    #     arrayStr = Converter.dictToJson(yCalcArray)
+    #     script = f'setCalculatedYData({arrayStr})'
+    #     chart = self._chartRefs['Plotly']['modelPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyRedrawModelChart(self):
-        chart = self._chartRefs['Plotly']['modelPage']
-        script = 'redrawPlot()'
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyRedrawModelChart(self):
+    #     chart = self._chartRefs['Plotly']['modelPage']
+    #     script = 'redrawPlot()'
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyReplaceCalculatedYOnModelChartAndRedraw(self):
-        chart = self._chartRefs['Plotly']['modelPage']
-        array = self._proxy.model.calculated[self._proxy.model.currentIndex]['yArray']
-        arrayStr = Converter.dictToJson(array)
-        script = f'redrawPlotWithNewCalculatedYJson({{ y:[{arrayStr}] }})'
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceCalculatedYOnModelChartAndRedraw(self):
+    #     chart = self._chartRefs['Plotly']['modelPage']
+    #     array = self._proxy.model.calculated[self._proxy.model.currentIndex]['yArray']
+    #     arrayStr = Converter.dictToJson(array)
+    #     script = f'redrawPlotWithNewCalculatedYJson({{ y:[{arrayStr}] }})'
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    # Plotly: Analysis
+    # # Plotly: Analysis
 
-    def plotlyReplaceXOnAnalysisChart(self):
-        index = self._proxy.experiment.currentIndex
-        xArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            xArray = self._proxy.experiment._xArrays[index]
-        arrayStr = Converter.dictToJson(xArray)
-        script = f'setXData({arrayStr})'
-        chart = self._chartRefs['Plotly']['analysisPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceXOnAnalysisChart(self):
+    #     index = self._proxy.experiment.currentIndex
+    #     xArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         xArray = self._proxy.experiment._xArrays[index]
+    #     arrayStr = Converter.dictToJson(xArray)
+    #     script = f'setXData({arrayStr})'
+    #     chart = self._chartRefs['Plotly']['analysisPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyReplaceMeasuredYOnAnalysisChart(self):
-        index = self._proxy.experiment.currentIndex
-        yMeasArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            yMeasArray = self._proxy.experiment._yMeasArrays[index]
-        arrayStr = Converter.dictToJson(yMeasArray)
-        script = f'setMeasuredYData({arrayStr})'
-        chart = self._chartRefs['Plotly']['analysisPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceMeasuredYOnAnalysisChart(self):
+    #     index = self._proxy.experiment.currentIndex
+    #     yMeasArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         yMeasArray = self._proxy.experiment._yMeasArrays[index]
+    #     arrayStr = Converter.dictToJson(yMeasArray)
+    #     script = f'setMeasuredYData({arrayStr})'
+    #     chart = self._chartRefs['Plotly']['analysisPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyReplaceTotalCalculatedYOnAnalysisChart(self):
-        index = self._proxy.experiment.currentIndex
-        yTotalCalcArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            yTotalCalcArray = self._proxy.analysis._yCalcTotal
-        arrayStr = Converter.dictToJson(yTotalCalcArray)
-        script = f'setCalculatedYData({arrayStr})'
-        chart = self._chartRefs['Plotly']['analysisPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceTotalCalculatedYOnAnalysisChart(self):
+    #     index = self._proxy.experiment.currentIndex
+    #     yTotalCalcArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         yTotalCalcArray = self._proxy.analysis._yCalcTotal
+    #     arrayStr = Converter.dictToJson(yTotalCalcArray)
+    #     script = f'setCalculatedYData({arrayStr})'
+    #     chart = self._chartRefs['Plotly']['analysisPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyRedrawAnalysisChart(self):
-        chart = self._chartRefs['Plotly']['analysisPage']
-        script = 'redrawPlot()'
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyRedrawAnalysisChart(self):
+    #     chart = self._chartRefs['Plotly']['analysisPage']
+    #     script = 'redrawPlot()'
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)
 
-    def plotlyReplaceTotalCalculatedYOnAnalysisChartAndRedraw(self):
-        if not self._proxy.analysis.defined:
-            return
-        index = self._proxy.experiment.currentIndex
-        yTotalCalcArray = np.empty(0)
-        if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
-            yTotalCalcArray = self._proxy.analysis._yCalcTotal
-        arrayStr = Converter.dictToJson(yTotalCalcArray)
-        script = f'redrawPlotWithNewCalculatedYJson({{ y:[{arrayStr}] }})'
-        chart = self._chartRefs['Plotly']['analysisPage']
-        WebEngine.runJavaScriptWithoutCallback(chart, script)
+    # def plotlyReplaceTotalCalculatedYOnAnalysisChartAndRedraw(self):
+    #     if not self._proxy.analysis.defined:
+    #         return
+    #     index = self._proxy.experiment.currentIndex
+    #     yTotalCalcArray = np.empty(0)
+    #     if index > -1 and len(self._proxy.experiment._xArrays):  # NEED FIX
+    #         yTotalCalcArray = self._proxy.analysis._yCalcTotal
+    #     arrayStr = Converter.dictToJson(yTotalCalcArray)
+    #     script = f'redrawPlotWithNewCalculatedYJson({{ y:[{arrayStr}] }})'
+    #     chart = self._chartRefs['Plotly']['analysisPage']
+    #     WebEngine.runJavaScriptWithoutCallback(chart, script)

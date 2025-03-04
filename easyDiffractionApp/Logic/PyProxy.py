@@ -17,7 +17,7 @@ from Logic.Summary import Summary
 from Logic.Status import Status
 from Logic.Plotting import Plotting
 from Logic.Helpers import BackendHelpers
-from easydiffraction.calculators.wrapper_factory import WrapperFactory
+from easydiffraction.calculators.wrapper_factory import WrapperFactory # noqa: F401
 
 
 class PyProxy(QObject):

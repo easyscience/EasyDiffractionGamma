@@ -107,7 +107,7 @@ class Fitting(QObject):
         targets = [component for component in refinement if refinement[component]]
         try:
             x_, y_, fit_func = self.generate_pol_fit_func(x, exp_data.y, exp_data.yb, targets)
-        except Exception as ex:
+        except Exception:
             raise NotImplementedError('This is not implemented for this calculator yet')
         weights = 1/exp_data.e
         weights = np.tile(weights, len(targets))
@@ -127,7 +127,7 @@ class Fitting(QObject):
         try:
             obj = self.fitter.fit_object
             fitter = CoreFitter(obj, fit_func)
-            res = fitter.fit(x_, y_, **kwargs)
+            _ = fitter.fit(x_, y_, **kwargs)
         except Exception as ex:
             self.failed.emit(str(ex))
             return
@@ -238,7 +238,7 @@ class Fitting(QObject):
 
     @Slot()
     def startStop(self):
-        name = 'pd_' + self.parent.experiment.job.experiment.name
+        # name = 'pd_' + self.parent.experiment.job.experiment.name
         self.parent.status.fitStatus = ''
         if self.parent.fittables._freeParamsCount <= 0:
             self.parent.status.fitStatus = 'No free params'

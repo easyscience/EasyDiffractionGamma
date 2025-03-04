@@ -13,7 +13,6 @@ from PySide6.QtQml import QJSValue
 
 from easydiffraction.calculators.cryspy.parser import Parameter
 from easydiffraction.io.cif import dataBlockToCif
-from easydiffraction import Job
 from Logic.Helpers import formatMsg
 # from easydiffraction.Jobs import get_job_from_cif_string
 
@@ -236,7 +235,7 @@ class Experiment(QObject):
 
     @Slot('QVariant')
     def loadExperimentsFromResources(self, fpaths):
-        if type(fpaths) == QJSValue:
+        if isinstance(fpaths, QJSValue):
             fpaths = fpaths.toVariant()
 
         for fpath in fpaths:
@@ -251,7 +250,7 @@ class Experiment(QObject):
 
     @Slot('QVariant')
     def loadExperimentsFromFiles(self, fpaths):
-        if type(fpaths) == QJSValue:
+        if isinstance(fpaths, QJSValue):
             fpaths = fpaths.toVariant()
         for idx, fpath in enumerate(fpaths):
             fpath = fpath.toLocalFile()
@@ -939,8 +938,8 @@ class Experiment(QObject):
         edRangeCif = f'_pd_meas.2theta_range_min {range_min}\n_pd_meas.2theta_range_max {range_max}'
         edCifNoMeas += '\n\n' + edRangeCif
 
-        edCifMeasOnly = dataBlockToCif(self.dataBlocksMeasOnly[self.currentIndex],
-                                                    includeBlockName=False)
+        # edCifMeasOnly = dataBlockToCif(self.dataBlocksMeasOnly[self.currentIndex],
+        #                                             includeBlockName=False)
 
         edCif = edCifNoMeas #+ '\n\n' + edCifMeasOnly
 
@@ -1091,7 +1090,7 @@ class Experiment(QObject):
         # Update the job object
         self.blocksToJob(blockIdx, category, name, field, value)
 
-        if type(value) == float:
+        if isinstance(value, float):
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{block}[{blockIdx}].{category}.{name}.{field}'))
         else:
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}.{name}.{field}'))

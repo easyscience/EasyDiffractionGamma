@@ -199,3 +199,45 @@ base_url = 'https://evermeet.cx/ffmpeg'
 file_name_base = 'ffmpeg-'
 file_ext = '.zip'
 exe = 'ffmpeg'
+
+########################
+# Configuration for ruff
+########################
+
+# 'ruff' -- Python linter and code formatter
+# https://docs.astral.sh/ruff/rules/
+
+[tool.ruff]
+exclude = ['tests', 'tools', 'docs']
+indent-width = 4
+line-length = 127
+
+[tool.ruff.format]
+docstring-code-format = true # Whether to format code snippets in docstrings
+indent-style = 'space'       # PEP 8 recommends using spaces over tabs
+line-ending = 'lf'           # Line endings will be converted to \n
+quote-style = 'single'       # But double quotes in docstrings (PEP 8, PEP 257)
+
+[tool.ruff.lint]
+select = [
+  'E',   # General PEP 8 style errors
+  'E9',  # Runtime errors (e.g., syntax errors, undefined names)
+  'F',   # Pyflakes-specific checks (e.g., unused variables, imports)
+  'F63', # Issues related to invalid escape sequences in strings
+  'F7',  # Type-related errors (e.g., mismatched argument types, unsupported operations)
+  'F82', # Import-related errors (e.g., unresolved imports, reimported modules)
+  'I',   # Import sorting issues (e.g., unsorted imports)
+  'S',   # Security-related issues (e.g., use of insecure functions or libraries)
+  'W',   # General PEP 8 warnings (e.g., lines too long, trailing whitespace)
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[tool.ruff.lint.per-file-ignores]
+# allow asserts in test files
+'*test_*.py' = ['S101']
+
+#[tool.ruff.lint.pycodestyle]
+#max-line-length = 88 # https://peps.python.org/pep-0008/#maximum-line-length
+#max-doc-length = 72  # https://peps.python.org/pep-0008/#maximum-line-length

@@ -7,8 +7,6 @@ import orjson
 import os
 import pathlib
 import sys
-import numpy as np
-from uncertainties import ufloat
 
 from PySide6.QtCore import Qt, QObject, QCoreApplication, QUrl, Signal, Slot, Property
 from PySide6.QtWidgets import QApplication

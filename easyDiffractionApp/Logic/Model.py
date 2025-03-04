@@ -11,8 +11,6 @@ from PySide6.QtCore import QFile, QTextStream, QIODevice
 from PySide6.QtQml import QJSValue
 
 from easydiffraction import Job
-from easydiffraction.job.model.phase import Phases
-from easydiffraction.calculators.wrapper_factory import WrapperFactory
 
 from easycrystallography.Components.AtomicDisplacement import AtomicDisplacement
 from easydiffraction.io.cif import dataBlockToCif
@@ -196,7 +194,7 @@ class Model(QObject):
 
     @Slot('QVariant')
     def loadModelsFromResources(self, fpaths):
-        if type(fpaths) == QJSValue:
+        if isinstance(fpaths, QJSValue):
             fpaths = fpaths.toVariant()
         for fpath in fpaths:
             console.debug(f"Loading model(s) from: {fpath}")
@@ -210,7 +208,7 @@ class Model(QObject):
 
     @Slot('QVariant')
     def loadModelsFromFiles(self, fpaths):
-        if type(fpaths) == QJSValue:
+        if isinstance(fpaths, QJSValue):
             fpaths = fpaths.toVariant()
         for fpath in fpaths:
             fpath = fpath.toLocalFile()
@@ -720,7 +718,7 @@ class Model(QObject):
         if oldValue == value:
             return False
         self._dataBlocks[blockIdx]['params'][category][name][field] = value
-        if type(value) == float:
+        if isinstance(value, float):
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{blockType}[{blockIdx}].{category}.{name}.{field}'))
         else:
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{blockType}[{blockIdx}].{category}.{name}.{field}'))
@@ -732,7 +730,7 @@ class Model(QObject):
         if oldValue == value:
             return False
         self._dataBlocks[blockIdx]['loops'][category][rowIndex][name][field] = value
-        if type(value) == float:
+        if isinstance(value, float):
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'))
         else:
             console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'))
