@@ -10,7 +10,6 @@ from Logic.Helpers import formatMsg
 
 
 class Connections(QObject):
-
     def __init__(self, parent):
         super().__init__(parent)
         self._proxy = parent
@@ -104,8 +103,9 @@ class Connections(QObject):
             self._proxy.experiment.runProfileCalculations()
             console.debug(formatMsg('main', 'Replacing arrays...'))
             self._proxy.experiment.replaceArrays()
-            console.debug(formatMsg('main',
-                    f'Redrawing curves on experiment page using {self._proxy.plotting.currentLib1d}...'))
+            console.debug(
+                formatMsg('main', f'Redrawing curves on experiment page using {self._proxy.plotting.currentLib1d}...')
+            )
             self._proxy.plotting.drawBackgroundOnExperimentChart()
 
         # Analysis page
@@ -353,8 +353,7 @@ class Connections(QObject):
         # self._proxy.plotting.drawBackgroundOnExperimentChart()
 
         # Analysis page
-        console.debug(formatMsg('main',
-                    f'Redrawing curves on analysis page using {self._proxy.plotting.currentLib1d}...'))
+        console.debug(formatMsg('main', f'Redrawing curves on analysis page using {self._proxy.plotting.currentLib1d}...'))
         self._proxy.plotting.drawBackgroundOnAnalysisChart()
         self._proxy.plotting.drawCalculatedOnAnalysisChart()
         self._proxy.plotting.drawResidualOnAnalysisChart()
@@ -364,9 +363,9 @@ class Connections(QObject):
         self._proxy.status.minimizer = f'Lmfit ({self._proxy.fitting.minimizerMethod})'
 
     def onJobToDataBlocks(self):
-        '''
+        """
         Update the parameter dictionaries based on the job objects
-        '''
+        """
         # MODEL
         dataBlocks = self._proxy.model.phaseToBlocks(self._proxy.job.phases)
         index = self._proxy.model.currentIndex
@@ -378,9 +377,9 @@ class Connections(QObject):
         self._proxy.experiment._dataBlocksNoMeas[index] = blocks
 
     def onIntermediateDataReady(self, iteration, data):
-        '''
+        """
         Update the structure dictionary based on the intermediate data
-        '''
+        """
         # every 10 iterations, send a signal to update the structure view
         self._proxy.status.fitIteration = f'{iteration}'
         if iteration % 10 == 0:

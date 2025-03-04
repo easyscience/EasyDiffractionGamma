@@ -17,6 +17,7 @@ from Logic.Helpers import formatMsg
 
 try:
     import cryspy
+
     console.debug('CrysPy module imported')
 except ImportError:
     console.error('No CrysPy module found')
@@ -202,7 +203,7 @@ class Summary(QObject):
     def resetAll(self):
         self.isCreated = False
         self._dataBlocksCif = ''
-        console.debug("All summary removed")
+        console.debug('All summary removed')
 
     @Property(bool, notify=isCreatedChanged)
     def isCreated(self):
@@ -258,15 +259,15 @@ class Summary(QObject):
                 if dataBlock.data_name == block['name']['value']:
                     if isinstance(dataBlock, cryspy.E_data_classes.cl_2_pd.Pd):
                         for subBlock in dataBlock.items:
-                                if isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_peak.PdPeakL):
-                                    cif = subBlock.to_cif()
-                                    dataBlocksCifList.append(cif)
-                                elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_proc.PdProcL):
-                                    cif = subBlock.to_cif()
-                                    dataBlocksCifList.append(cif)
-                                elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_meas.PdMeasL):
-                                    cif = subBlock.to_cif()
-                                    dataBlocksCifList.append(cif)
+                            if isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_peak.PdPeakL):
+                                cif = subBlock.to_cif()
+                                dataBlocksCifList.append(cif)
+                            elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_proc.PdProcL):
+                                cif = subBlock.to_cif()
+                                dataBlocksCifList.append(cif)
+                            elif isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_pd_meas.PdMeasL):
+                                cif = subBlock.to_cif()
+                                dataBlocksCifList.append(cif)
                     elif isinstance(dataBlock, cryspy.E_data_classes.cl_2_tof.TOF):
                         for subBlock in dataBlock.items:
                             if isinstance(subBlock, cryspy.C_item_loop_classes.cl_1_tof_peak.TOFPeakL):
@@ -358,12 +359,12 @@ class Summary(QObject):
 
             html_experiment = _HTML_DATA_COLLECTION_TEMPLATE
             html_experiment = html_experiment.replace('experiment_name', f'{experiment_name}')
-            html_experiment = html_experiment.replace('radiation_probe', f"{radiation_probe}")
-            html_experiment = html_experiment.replace('radiation_type', f"{radiation_type}")
-            html_experiment = html_experiment.replace('range_min', f"{range_min}")
-            html_experiment = html_experiment.replace('range_max', f"{range_max}")
-            html_experiment = html_experiment.replace('range_inc', f"{range_inc}")
-            html_experiment = html_experiment.replace('range_units', f"{range_units}")
+            html_experiment = html_experiment.replace('radiation_probe', f'{radiation_probe}')
+            html_experiment = html_experiment.replace('radiation_type', f'{radiation_type}')
+            html_experiment = html_experiment.replace('range_min', f'{range_min}')
+            html_experiment = html_experiment.replace('range_max', f'{range_max}')
+            html_experiment = html_experiment.replace('range_inc', f'{range_inc}')
+            html_experiment = html_experiment.replace('range_units', f'{range_units}')
             html_experiment = html_experiment.replace('num_data_points', f'{num_data_points}')
             html_experiments.append(html_experiment)
 
@@ -387,7 +388,7 @@ class Summary(QObject):
         self.asHtml = html
 
     def loadReportFromResources(self, fpath):
-        console.debug(f"Loading model(s) from: {fpath}")
+        console.debug(f'Loading model(s) from: {fpath}')
         file = QFile(fpath)
         if not file.open(QIODevice.ReadOnly | QIODevice.Text):
             console.error('Not found in resources')
@@ -400,9 +401,9 @@ class Summary(QObject):
 
     def loadReportFromFile(self, fpath):
         fpath = fpath.toLocalFile()
-        console.debug(f"Loading report from: {fpath}")
+        console.debug(f'Loading report from: {fpath}')
         if not os.path.isfile(fpath):
-            console.error(f"File not found: {fpath}")
+            console.error(f'File not found: {fpath}')
             return
         with open(fpath, 'r') as file:
             edCif = file.read()

@@ -27,7 +27,7 @@ class PyProxy(QObject):
         super().__init__(parent)
         self._logger = LoggerLevelHandler(self)
         self._project = Project(self)
-        self._model = Model(self) # Model assigns a default job and interface
+        self._model = Model(self)  # Model assigns a default job and interface
         self.interface = self._model._interface
         # Now we have the default job so the subsequent modules can be initialized
         self._experiment = Experiment(self, interface=self.interface)
@@ -99,8 +99,8 @@ class PyProxy(QObject):
 
     @Slot()
     def resetAll(self):
-        self._connections.resetAll() # Needs to be reset FIRST to disconnect all the signals
-        self._model = Model(self) # Model assigns a default job and interface
+        self._connections.resetAll()  # Needs to be reset FIRST to disconnect all the signals
+        self._model = Model(self)  # Model assigns a default job and interface
         self.interface = self._model._interface
         self._experiment.resetAll()
         self._experiment._interface = self.interface

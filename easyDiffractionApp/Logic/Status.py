@@ -146,9 +146,9 @@ class Status(QObject):
         self.fitIteration = ''
         self.goodnessOfFit = ''
         self.fitStatus = ''
-        console.debug("All status info removed")
+        console.debug('All status info removed')
 
     @staticmethod
     def truncate_float(number, decimals=5):
-        factor = 10 ** decimals
+        factor = 10**decimals
         return int(number * factor) / factor

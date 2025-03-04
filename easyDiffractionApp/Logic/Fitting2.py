@@ -23,21 +23,24 @@ from PySide6.QtCore import Slot
 
 def _defaultFitResults():
     return {
-        "success": None,
-        "nvarys":  None,
+        'success': None,
+        'nvarys': None,
         # "GOF":     None,
-        "redchi2": None
+        'redchi2': None,
     }
+
 
 class BackendBridge(QObject):
     # Signal to send data to the GUI
     intermediate_data_ready = Signal(int, object)
+
 
 # class FittingLogic(QObject):
 class Fitting(QObject):
     """
     Logic related to the fitter setup
     """
+
     fitFinished = Signal()
     fitStarted = Signal()
     currentMinimizerChanged = Signal()
@@ -57,7 +60,7 @@ class Fitting(QObject):
         self.bridge = BackendBridge()
 
         # Multithreading
-        self.use_threading = True # change to False to disable threading for testing
+        self.use_threading = True  # change to False to disable threading for testing
         self._fit_finished = True
         self._fit_results = _defaultFitResults()
         self.data = None
@@ -65,7 +68,7 @@ class Fitting(QObject):
         self.is_fitting_now = False
         self._current_minimizer_method_index = 0
         # self._current_minimizer_method_name = self.fitter.available_interfaces()[0]  # noqa: E501
-        self._current_minimizer_method_name = "least_squares"
+        self._current_minimizer_method_name = 'least_squares'
         self.currentMinimizerChanged.connect(self.onCurrentMinimizerChanged)
 
         self.fit_thread = Thread(target=self.fit_threading, args=(self.bridge,))
@@ -73,14 +76,13 @@ class Fitting(QObject):
         self.failed.connect(self.onFailed)
 
     def fit_nonpolar(self, *args):
-
         method = self._current_minimizer_method_name
         self._fit_finished = False
         # reset the iter counter
         self.interface._InterfaceFactoryTemplate__interface_obj._iteration = 0
         self.fitStarted.emit()
 
-        kwargs = {'method' : method}
+        kwargs = {'method': method}
 
         # add the bridge info from args
         if len(args) > 0:
@@ -112,21 +114,18 @@ class Fitting(QObject):
             x_, y_, fit_func = self.generate_pol_fit_func(x, exp_data.y, exp_data.yb, targets)
         except Exception:
             raise NotImplementedError('This is not implemented for this calculator yet')
-        weights = 1/exp_data.e
+        weights = 1 / exp_data.e
         weights = np.tile(weights, len(targets))
 
-        kwargs = {
-            'weights': weights,
-            'method': method
-        }
+        kwargs = {'weights': weights, 'method': method}
 
-        #local_kwargs = {}
+        # local_kwargs = {}
         if method == 'least_squares':
             kwargs['minimizer_kwargs'] = {'diff_step': 1e-5}
 
         # save some kwargs on the interface object for use in the calculator
         # TODO FIX THIS THIS IS NOT THE WAY TO DO IT :-/
-        #self.interface._InterfaceFactoryTemplate__interface_obj.saved_kwargs = local_kwargs
+        # self.interface._InterfaceFactoryTemplate__interface_obj.saved_kwargs = local_kwargs
         try:
             obj = self.fitter.fit_object
             fitter = CoreFitter(obj, fit_func)
@@ -145,23 +144,17 @@ class Fitting(QObject):
     ) -> Callable:
         num_components = len(components)
         dummy_x = np.repeat(x_array[..., np.newaxis], num_components, axis=x_array.ndim)
-        calculated_y = np.array(
-            [fun(spin_up, spin_down) for fun in components]
-        ).swapaxes(0, x_array.ndim)
+        calculated_y = np.array([fun(spin_up, spin_down) for fun in components]).swapaxes(0, x_array.ndim)
 
         def pol_fit_fuction(dummy_x: np.ndarray, **kwargs) -> np.ndarray:
-            results, results_dict = self.interface().full_callback(
-                x_array, pol_fn=components[0], **kwargs
-            )
-            phases = list(results_dict["phases"].keys())[0]
+            results, results_dict = self.interface().full_callback(x_array, pol_fn=components[0], **kwargs)
+            phases = list(results_dict['phases'].keys())[0]
             up, down = (
-                results_dict["phases"][phases]["components"]["up"],
-                results_dict["phases"][phases]["components"]["down"],
+                results_dict['phases'][phases]['components']['up'],
+                results_dict['phases'][phases]['components']['down'],
             )
-            bg = results_dict["f_background"]
-            sim_y = np.array(
-                [fun(up, down) + fun(bg, bg) for fun in components]
-            ).swapaxes(0, x_array.ndim)
+            bg = results_dict['f_background']
+            sim_y = np.array([fun(up, down) + fun(bg, bg) for fun in components]).swapaxes(0, x_array.ndim)
             return sim_y.flatten()
 
         return dummy_x.flatten(), calculated_y.flatten(), pol_fit_fuction
@@ -179,11 +172,7 @@ class Fitting(QObject):
         self._fit_results['success'] = 'Failure'  # not None but a string
 
     def setSuccessFitResults(self):
-        self._fit_results = {
-            "success": self.res.success,
-            "nvarys":  self.res.n_pars,
-            "redchi2": float(self.res.reduced_chi)
-        }
+        self._fit_results = {'success': self.res.success, 'nvarys': self.res.n_pars, 'redchi2': float(self.res.reduced_chi)}
         console.info('Optimization successfully finished')
         self.parent.status.fitStatus = 'Success'
         self.jobToDataBlocks.emit()
@@ -203,7 +192,7 @@ class Fitting(QObject):
         to_zero = all_pars.difference(fit_pars)
         # borg.stack.beginMacro('reset errors')
         for par in to_zero:
-            par.error = 0.
+            par.error = 0.0
         # borg.stack.endMacro()
         # macro = borg.stack.history.popleft()
         # for command in macro._commands:
@@ -234,7 +223,7 @@ class Fitting(QObject):
         self.finishFit()
 
     def onFailed(self, ex):
-        print("**** onFailed: fit FAILED with:\n {}".format(str(ex)))
+        print('**** onFailed: fit FAILED with:\n {}'.format(str(ex)))
         self.joinFitThread()
         self.setFailedFitResults()
         self.finishFit()
@@ -294,9 +283,9 @@ class Fitting(QObject):
     def minimizerMethodNames(self):
         current_minimizer = self.fitter.available_engines[self.currentMinimizerIndex()]  # noqa: E501
         tested_methods = {
-            'lmfit': ['least_squares', 'leastsq'], # 'least_squares', 'powell', 'cobyla', 'leastsq'
-            'bumps': ['lm'], # 'newton', 'lm'
-            'DFO_LS': ['leastsq']
+            'lmfit': ['least_squares', 'leastsq'],  # 'least_squares', 'powell', 'cobyla', 'leastsq'
+            'bumps': ['lm'],  # 'newton', 'lm'
+            'DFO_LS': ['leastsq'],
         }
         return tested_methods[current_minimizer]
 
@@ -314,27 +303,24 @@ class Fitting(QObject):
         self.currentMinimizerMethodIndex(new_method_index)
 
     def fittingNamesDict(self):
-        return {
-            'engine': self.fitter.current_engine.name,
-            'method': self._current_minimizer_method_name
-            }
+        return {'engine': self.fitter.current_engine.name, 'method': self._current_minimizer_method_name}
 
     ####################################################################################################################
     # Calculator
     ####################################################################################################################
 
     def calculatorNames(self):
-        interfaces = self.interface.interface_compatability("Npowder1DCWunp")     ## (self.parent.sample().exp_type_str)
+        interfaces = self.interface.interface_compatability('Npowder1DCWunp')  ## (self.parent.sample().exp_type_str)
         return interfaces
 
     def currentCalculatorIndex(self):
-        interfaces = self.interface.interface_compatability("Npowder1DCWunp")    #(self.parent.sample().exp_type_str)
+        interfaces = self.interface.interface_compatability('Npowder1DCWunp')  # (self.parent.sample().exp_type_str)
         return interfaces.index(self.interface.current_interface_name)
 
     def setCurrentCalculatorIndex(self, new_index: int):
         if self.currentCalculatorIndex == new_index:
             return
-        interfaces = self.interface.interface_compatability("Npowder1DCWunp")
+        interfaces = self.interface.interface_compatability('Npowder1DCWunp')
         new_name = interfaces[new_index]
 
         self.interface.switch(new_name, fitter=self.fitter)
@@ -342,7 +328,7 @@ class Fitting(QObject):
         # recreate the fitter with the new interface
         self.fitter = CoreFitter(self.parent.sample(), self.parent.sample().create_simulation)
 
-        print("***** _onCurrentCalculatorChanged")
+        print('***** _onCurrentCalculatorChanged')
         data = self.parent.pdata().simulations[0]
         data.name = f'{self.interface.current_interface_name} engine'
         # update interface on job
@@ -351,10 +337,9 @@ class Fitting(QObject):
         self.parent.updateCalculatedData()
 
     # Constraints
-    def addConstraint(self, dependent_par_idx, relational_operator,
-                      value, arithmetic_operator, independent_par_idx):
-        if dependent_par_idx == -1 or value == "":
-            print("Failed to add constraint: Unsupported type")
+    def addConstraint(self, dependent_par_idx, relational_operator, value, arithmetic_operator, independent_par_idx):
+        if dependent_par_idx == -1 or value == '':
+            print('Failed to add constraint: Unsupported type')
             return
         # if independent_par_idx == -1:
         #    print(f"Add constraint: {self.fitablesList()[dependent_par_idx]['label']}{relational_operator}{value}")
@@ -362,16 +347,12 @@ class Fitting(QObject):
         #    print(f"Add constraint: {self.fitablesList()[dependent_par_idx]['label']}{relational_operator}{value}"
         #    "{arithmetic_operator}{self.fitablesList()[independent_par_idx]['label']}")
         pars = [par for par in self.fitter.fit_object.get_parameters() if par.enabled]
-        if arithmetic_operator != "" and independent_par_idx > -1:
-            c = ObjConstraint(pars[dependent_par_idx],
-                              str(float(value)) + arithmetic_operator,
-                              pars[independent_par_idx])
-        elif arithmetic_operator == "" and independent_par_idx == -1:
-            c = NumericConstraint(pars[dependent_par_idx],
-                                  relational_operator.replace("=", "=="),
-                                  float(value))
+        if arithmetic_operator != '' and independent_par_idx > -1:
+            c = ObjConstraint(pars[dependent_par_idx], str(float(value)) + arithmetic_operator, pars[independent_par_idx])
+        elif arithmetic_operator == '' and independent_par_idx == -1:
+            c = NumericConstraint(pars[dependent_par_idx], relational_operator.replace('=', '=='), float(value))
         else:
-            print("Failed to add constraint: Unsupported type")
+            print('Failed to add constraint: Unsupported type')
             return
         # print(c)
         c()
@@ -382,28 +363,30 @@ class Fitting(QObject):
         for index, constraint in enumerate(self.fitter.fit_constraints()):
             if type(constraint) is ObjConstraint:
                 independent_name = constraint.get_obj(constraint.independent_obj_ids).name
-                relational_operator = "="
+                relational_operator = '='
                 value = float(constraint.operator[:-1])
                 arithmetic_operator = constraint.operator[-1]
             elif type(constraint) is NumericConstraint:
-                independent_name = ""
-                relational_operator = constraint.operator.replace("==", "=")
+                independent_name = ''
+                relational_operator = constraint.operator.replace('==', '=')
                 value = constraint.value
-                arithmetic_operator = ""
+                arithmetic_operator = ''
             else:
-                print(f"Failed to get constraint: Unsupported type {type(constraint)}")
+                print(f'Failed to get constraint: Unsupported type {type(constraint)}')
                 return
             number = index + 1
             dependent_name = constraint.get_obj(constraint.dependent_obj_ids).name
             enabled = int(constraint.enabled)
             constraint_list.append(
-                {"number": number,
-                 "dependentName": dependent_name,
-                 "relationalOperator": relational_operator,
-                 "value": value,
-                 "arithmeticOperator": arithmetic_operator,
-                 "independentName": independent_name,
-                 "enabled": enabled}
+                {
+                    'number': number,
+                    'dependentName': dependent_name,
+                    'relationalOperator': relational_operator,
+                    'value': value,
+                    'arithmeticOperator': arithmetic_operator,
+                    'independentName': independent_name,
+                    'enabled': enabled,
+                }
             )
         return constraint_list
 
@@ -428,6 +411,7 @@ class Fitter(QThread):
     """
     Simple wrapper for calling a function in separate thread
     """
+
     failed = Signal(str)
     finished = Signal()
 
@@ -453,4 +437,3 @@ class Fitter(QThread):
     def stop(self):
         self.terminate()
         self.wait()  # to assure proper termination
-

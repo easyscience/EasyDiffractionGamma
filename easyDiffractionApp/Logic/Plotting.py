@@ -32,11 +32,7 @@ class Plotting(QObject):
         self._useAcceleration1d = True
         self._chartRanges = {}
         self._chartRefs = {
-            'Plotly': {
-                'experimentPage': None,
-                'modelPage': None,
-                'analysisPage': None
-            },
+            'Plotly': {'experimentPage': None, 'modelPage': None, 'analysisPage': None},
             'QtCharts': {
                 'experimentPage': {
                     'measSerie': None,  # QtCharts.QXYSeries,
@@ -51,9 +47,9 @@ class Plotting(QObject):
                     'bkgSerie': None,  # QtCharts.QXYSeries,
                     'totalCalcSerie': None,  # QtCharts.QXYSeries,
                     'residSerie': None,  # QtCharts.QXYSeries,
-                    'braggSeries': {}  # QtCharts.QXYSeries
-                }
-            }
+                    'braggSeries': {},  # QtCharts.QXYSeries
+                },
+            },
         }
 
     # Frontend/Backend public properties
@@ -92,7 +88,7 @@ class Plotting(QObject):
 
     @Slot(str, str, 'QVariant')
     def setQtChartsSerieRef(self, page, serie, ref):
-        #if self._chartRefs['QtCharts'][page][serie] == ref:
+        # if self._chartRefs['QtCharts'][page][serie] == ref:
         #    return
         if ref.name():  # braggSeries
             self._chartRefs['QtCharts'][page][serie][ref.name()] = ref
@@ -120,12 +116,11 @@ class Plotting(QObject):
                 textureImage.setPixelColor(column, row, Qt.transparent)
         # Vertical line
         for row in range(height):
-            column = int(width/2)
+            column = int(width / 2)
             textureImage.setPixelColor(column, row, color)
         brush = QBrush()
         brush.setTextureImage(textureImage)
         return brush
-
 
     # Backend public methods
 
@@ -171,7 +166,7 @@ class Plotting(QObject):
         if lib == 'QtCharts':
             self.qtchartsReplaceTotalCalculatedOnAnalysisChartAndRedraw()
         elif lib == 'Plotly':
-            #self.plotlyReplaceTotalCalculatedYOnAnalysisChartAndRedraw()
+            # self.plotlyReplaceTotalCalculatedYOnAnalysisChartAndRedraw()
             pass
 
     def drawResidualOnAnalysisChart(self):
@@ -275,8 +270,9 @@ class Plotting(QObject):
                 yBraggArray = np.full_like(xBraggArray, -phaseIdx * 0.5)
                 braggSerie = self._chartRefs['QtCharts']['analysisPage']['braggSeries'][phaseName]
                 braggSerie.replaceNp(xBraggArray, yBraggArray)
-                console.debug(formatMsg('sub',
-                        f'Bragg peaks {phaseName}', f'{xBraggArray.size} points', 'on analysis page', 'replaced'))
+                console.debug(
+                    formatMsg('sub', f'Bragg peaks {phaseName}', f'{xBraggArray.size} points', 'on analysis page', 'replaced')
+                )
         except IndexError:
             pass
 

@@ -76,6 +76,8 @@ BLOCK2PHASE = {
     'B_iso_or_equiv': 'b_iso_or_equiv',
     'U_iso_or_equiv': 'u_iso_or_equiv',
 }
+
+
 class Model(QObject):
     definedChanged = Signal()
     currentIndexChanged = Signal()
@@ -107,7 +109,7 @@ class Model(QObject):
 
         self.createJob()
 
-        self.phases = self.job.phases #Phases()
+        self.phases = self.job.phases  # Phases()
 
     # QML accessible properties
 
@@ -140,7 +142,7 @@ class Model(QObject):
         if self._currentIndex == newValue:
             return
         self._currentIndex = newValue
-        console.debug(f"Current model index: {newValue}")
+        console.debug(f'Current model index: {newValue}')
         self.currentIndexChanged.emit()
 
     @Property('QVariant', notify=dataBlocksChanged)
@@ -193,7 +195,7 @@ class Model(QObject):
 
     @Slot()
     def addDefaultModel(self):
-        console.debug("Adding default model(s)")
+        console.debug('Adding default model(s)')
         self.loadModelsFromEdCif(_DEFAULT_CIF_BLOCK)
 
     @Slot('QVariant')
@@ -201,7 +203,7 @@ class Model(QObject):
         if isinstance(fpaths, QJSValue):
             fpaths = fpaths.toVariant()
         for fpath in fpaths:
-            console.debug(f"Loading model(s) from: {fpath}")
+            console.debug(f'Loading model(s) from: {fpath}')
             file = QFile(fpath)
             if not file.open(QIODevice.ReadOnly | QIODevice.Text):
                 console.error('Not found in resources')
@@ -216,7 +218,7 @@ class Model(QObject):
             fpaths = fpaths.toVariant()
         for fpath in fpaths:
             fpath = fpath.toLocalFile()
-            console.debug(f"Loading model(s) from: {fpath}")
+            console.debug(f'Loading model(s) from: {fpath}')
             with open(fpath, 'r') as file:
                 edCif = file.read()
             edCif = re.sub(r'data_(.*)', lambda m: m.group(0).lower(), edCif)  # Lowercase all data block names
@@ -237,9 +239,9 @@ class Model(QObject):
         self.dataBlocksChanged.emit()
 
     def updateCifOnInterface(self):
-        '''
+        """
         Update the CIF representation on the current interface
-        '''
+        """
         cif = self._dataBlocksCif[self.currentIndex][0]
         self._interface.updateModelCif(cif)
 
@@ -263,6 +265,7 @@ class Model(QObject):
         icon = 'ruler'
         categoryIcon = 'cube'
         absDelta = 0.1
+
         def addKeys():
             blocks[params][category][name]['category'] = category
             blocks[params][category][name]['name'] = name
@@ -270,32 +273,33 @@ class Model(QObject):
             blocks[params][category][name]['icon'] = icon
             blocks[params][category][name]['categoryIcon'] = categoryIcon
             blocks[params][category][name]['absDelta'] = absDelta
+
         blocks[params][category][name] = self.fromParameterObject(phase.cell.length_a)
         blocks[params][category][name]['value'] = float(phase.cell.length_a.value)
-        blocks[params][category][name]['shortPrettyName'] = "a"
+        blocks[params][category][name]['shortPrettyName'] = 'a'
         addKeys()
         name = 'length_b'
         blocks[params][category][name] = self.fromParameterObject(phase.cell.length_b)
-        blocks[params][category][name]['shortPrettyName'] = "b"
+        blocks[params][category][name]['shortPrettyName'] = 'b'
         addKeys()
         name = 'length_c'
         blocks[params][category][name] = self.fromParameterObject(phase.cell.length_c)
-        blocks[params][category][name]['shortPrettyName'] = "c"
+        blocks[params][category][name]['shortPrettyName'] = 'c'
         addKeys()
         name = 'angle_alpha'
         unit = '°'
         categoryIcon = 'less-than'
         absDelta = 1.0
         blocks[params][category][name] = self.fromParameterObject(phase.cell.angle_alpha)
-        blocks[params][category][name]['shortPrettyName'] = "α"
+        blocks[params][category][name]['shortPrettyName'] = 'α'
         addKeys()
         name = 'angle_beta'
         blocks[params][category][name] = self.fromParameterObject(phase.cell.angle_beta)
-        blocks[params][category][name]['shortPrettyName'] = "β"
+        blocks[params][category][name]['shortPrettyName'] = 'β'
         addKeys()
         name = 'angle_gamma'
         blocks[params][category][name] = self.fromParameterObject(phase.cell.angle_gamma)
-        blocks[params][category][name]['shortPrettyName'] = "γ"
+        blocks[params][category][name]['shortPrettyName'] = 'γ'
         addKeys()
 
         ###### SPACE GROUP
@@ -303,7 +307,7 @@ class Model(QObject):
         blocks[params][category] = {}
         name = 'name_H-M_alt'
         blocks[params][category][name] = self.fromDescriptorObject(phase.space_group.space_group_HM_name)
-        blocks[params][category][name]['shortPrettyName'] = "name"
+        blocks[params][category][name]['shortPrettyName'] = 'name'
         blocks[params][category][name]['enabled'] = True
         blocks[params][category][name]['category'] = category
         blocks[params][category][name]['name'] = name
@@ -311,7 +315,7 @@ class Model(QObject):
         name = 'crystal_system'
         blocks[params][category][name] = {}
         blocks[params][category][name]['value'] = phase.space_group.crystal_system
-        blocks[params][category][name]['shortPrettyName'] = "crystal system"
+        blocks[params][category][name]['shortPrettyName'] = 'crystal system'
         blocks[params][category][name]['name'] = name
         blocks[params][category][name]['category'] = category
         blocks[params][category][name]['url'] = blocks[params][category]['name_H-M_alt']['url']
@@ -319,7 +323,7 @@ class Model(QObject):
         name = 'IT_number'
         blocks[params][category][name] = {}
         blocks[params][category][name]['value'] = phase.space_group.int_number
-        blocks[params][category][name]['shortPrettyName'] = "number"
+        blocks[params][category][name]['shortPrettyName'] = 'number'
         blocks[params][category][name]['name'] = name
         blocks[params][category][name]['category'] = category
         blocks[params][category][name]['error'] = 0.0
@@ -328,10 +332,10 @@ class Model(QObject):
 
         name = 'IT_coordinate_system_code'
         blocks[params][category][name] = {}
-        setting = phase.space_group.setting.value if phase.space_group.setting is not None else ""
+        setting = phase.space_group.setting.value if phase.space_group.setting is not None else ''
         blocks[params][category][name]['value'] = setting
         blocks[params][category][name]['permittedValues'] = SpaceGroup.find_settings_by_number(phase.space_group.int_number)
-        blocks[params][category][name]['shortPrettyName'] = "code"
+        blocks[params][category][name]['shortPrettyName'] = 'code'
         blocks[params][category][name]['name'] = name
         blocks[params][category][name]['category'] = category
         blocks[params][category][name]['error'] = 0.0
@@ -346,6 +350,7 @@ class Model(QObject):
         absDelta = 0.05
         icon = 'map-marker-alt'
         unit = 'Å'
+
         def addKeys():
             atomDict[params]['category'] = category
             atomDict[params]['idx'] = idx
@@ -359,45 +364,49 @@ class Model(QObject):
 
         for idx, atom in enumerate(phase.atoms):
             atomDict = {}
-            atomDict['type_symbol'] = {'shortPrettyName': 'type',
-                                       'value': atom.specie.symbol,
-                                       'name': 'type_symbol',
-                                       'category': category,
-                                       'idx': idx}
+            atomDict['type_symbol'] = {
+                'shortPrettyName': 'type',
+                'value': atom.specie.symbol,
+                'name': 'type_symbol',
+                'category': category,
+                'idx': idx,
+            }
             atomDict['label'] = self.fromDescriptorObject(atom.label)
             atomDict['label']['idx'] = idx
-            atomDict['label']['shortPrettyName'] = "label"
+            atomDict['label']['shortPrettyName'] = 'label'
             atomDict['label']['name'] = 'label'
             atomDict['label']['category'] = category
             params = 'fract_x'
             atomDict[params] = self.fromParameterObject(atom.fract_x)
-            atomDict[params]['shortPrettyName'] = "x"
+            atomDict[params]['shortPrettyName'] = 'x'
             atomDict[params]['name'] = 'fract_x'
             addKeys()
             params = 'fract_y'
             atomDict[params] = self.fromParameterObject(atom.fract_y)
-            atomDict[params]['shortPrettyName'] = "y"
+            atomDict[params]['shortPrettyName'] = 'y'
             atomDict[params]['name'] = 'fract_y'
             addKeys()
             params = 'fract_z'
             atomDict[params] = self.fromParameterObject(atom.fract_z)
-            atomDict[params]['shortPrettyName'] = "z"
+            atomDict[params]['shortPrettyName'] = 'z'
             atomDict[params]['name'] = 'fract_z'
             addKeys()
             params = 'occupancy'
             atomDict[params] = self.fromParameterObject(atom.occupancy)
-            atomDict[params]['shortPrettyName'] = "occ"
+            atomDict[params]['shortPrettyName'] = 'occ'
             atomDict[params]['name'] = 'occupancy'
             icon = 'fill'
             addKeys()
 
-            atomDict['Wyckoff_symbol'] = {'shortPrettyName': 'WP',
-                                       'value': self.getWyckoffSymbol(atom),
-                                       'name': 'Wyckoff_symbol',
-                                       'category': category,
-                                       'idx': idx,
-                                       'optional': True,
-                                       'fittable': False}
+            atomDict['Wyckoff_symbol'] = {
+                'shortPrettyName': 'WP',
+                'value': self.getWyckoffSymbol(atom),
+                'name': 'Wyckoff_symbol',
+                'category': category,
+                'idx': idx,
+                'optional': True,
+                'fittable': False,
+            }
 
             if hasattr(atom, 'adp') and isinstance(atom.adp, AtomicDisplacement):
                 atomDict['ADP_type'] = {}
@@ -411,8 +420,8 @@ class Model(QObject):
                     params = 'B_iso_or_equiv'
                     icon = 'arrows-alt'
                     atomDict[params] = self.fromParameterObject(atom.adp.Biso)
-                    atomDict[params]['shortPrettyName'] = "iso"
-                    atomDict[params]['name'] = "B_iso_or_equiv"
+                    atomDict[params]['shortPrettyName'] = 'iso'
+                    atomDict[params]['name'] = 'B_iso_or_equiv'
                     atomDict[params]['unit'] = unit
                     addKeys()
 
@@ -420,8 +429,8 @@ class Model(QObject):
                     atomDict['ADP_type']['value'] = 'Uiso'
                     params = 'U_iso_or_equiv'
                     atomDict[params] = self.fromParameterObject(atom.adp.Uiso)
-                    atomDict[params]['shortPrettyName'] = "U_iso_or_equiv"
-                    atomDict[params]['name'] = "U_iso_or_equiv"
+                    atomDict[params]['shortPrettyName'] = 'U_iso_or_equiv'
+                    atomDict[params]['name'] = 'U_iso_or_equiv'
                     atomDict[params]['unit'] = unit
                     addKeys()
 
@@ -459,7 +468,7 @@ class Model(QObject):
         dict_repr['value'] = coreObject.value
         dict_repr['prettyName'] = coreObject.display_name
         dict_repr['url'] = coreObject.url
-        dict_repr['fittable'] = False # none of the descriptors are fittables
+        dict_repr['fittable'] = False  # none of the descriptors are fittables
         return dict_repr
 
     def blocksToPhase(self, blockIdx, category, name, field, value):
@@ -545,7 +554,7 @@ class Model(QObject):
         """
         New CIF -> _dataBlocks ( -> _dataBlocksCif -> calcObj and calcDict)
         """
-        console.debug("Calculator obj and dict need to be replaced")
+        console.debug('Calculator obj and dict need to be replaced')
         if edCif:
             self.removeModel(self.currentIndex)
             self.loadModelsFromEdCif(edCif)
@@ -554,7 +563,7 @@ class Model(QObject):
 
     @Slot(int)
     def removeModel(self, index):
-        console.debug(f"Removing model no. {index + 1}")
+        console.debug(f'Removing model no. {index + 1}')
         if len(self.dataBlocks) < index + 1:
             return
         currentDataBlock = self.dataBlocks[index]
@@ -562,7 +571,7 @@ class Model(QObject):
 
         # self._interface.remove_phase(currentModelName) # delete phase info on interface
         self._interface.remove_phase(phases_obj=self.phases, phase_obj=self.phases[self.currentIndex])
-        self.removePhase(currentModelName) # delete phase locally
+        self.removePhase(currentModelName)  # delete phase locally
         del self._dataBlocks[index]
 
         self.defined = bool(len(self.dataBlocks))
@@ -570,7 +579,7 @@ class Model(QObject):
             self._currentIndex = -1
 
         # self.dataBlocksChanged.emit()
-        console.debug(f"Model no. {index + 1} has been removed")
+        console.debug(f'Model no. {index + 1} has been removed')
 
     @Slot()
     def resetAll(self):
@@ -582,7 +591,7 @@ class Model(QObject):
         for name in self.phases.phase_names:
             del self.phases[name]
         self.dataBlocksChanged.emit()
-        console.debug("All models removed")
+        console.debug('All models removed')
 
     @Slot(int, str, str, str, 'QVariant')
     def setMainParamWithFullUpdate(self, blockIdx, category, name, field, value):
@@ -668,8 +677,8 @@ class Model(QObject):
 
     def createIsotopesNames(self):
         elements = pt.elements
-        isotopes = [element.symbol for element in elements][1:] # skip 'n'
-        isotopes.extend([str(iso) + element.symbol for element in elements for iso in element.isotopes][1:]) # skip '1n'
+        isotopes = [element.symbol for element in elements][1:]  # skip 'n'
+        isotopes.extend([str(iso) + element.symbol for element in elements for iso in element.isotopes][1:])  # skip '1n'
         return isotopes
 
     def removeDataBlockLoopRow(self, category, rowIndex):
@@ -686,15 +695,15 @@ class Model(QObject):
         lastAtom = self._dataBlocks[blockIdx]['loops'][category][-1]
 
         newAtom = copy.deepcopy(lastAtom)
-        atom_type = random.choice(self.isotopesNames) # noqa: S311
+        atom_type = random.choice(self.isotopesNames)  # noqa: S311
 
         newAtom['label']['value'] = atom_type
         # type symbol is atom_type but with numerical prefix removed
         type_symbol = re.sub(r'[0-9]', '', atom_type)
         newAtom['type_symbol']['value'] = type_symbol
-        newAtom['fract_x']['value'] = random.uniform(0, 1) # noqa: S311
-        newAtom['fract_y']['value'] = random.uniform(0, 1) # noqa: S311
-        newAtom['fract_z']['value'] = random.uniform(0, 1) # noqa: S311
+        newAtom['fract_x']['value'] = random.uniform(0, 1)  # noqa: S311
+        newAtom['fract_y']['value'] = random.uniform(0, 1)  # noqa: S311
+        newAtom['fract_z']['value'] = random.uniform(0, 1)  # noqa: S311
         newAtom['occupancy']['value'] = 1
         newAtom['B_iso_or_equiv']['value'] = 0
 
@@ -723,11 +732,15 @@ class Model(QObject):
             return False
         self._dataBlocks[blockIdx]['params'][category][name][field] = value
         if isinstance(value, float):
-            console.debug(formatMsg(
-                'sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{blockType}[{blockIdx}].{category}.{name}.{field}'))
+            console.debug(
+                formatMsg(
+                    'sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{blockType}[{blockIdx}].{category}.{name}.{field}'
+                )
+            )
         else:
-            console.debug(formatMsg(
-                'sub', 'Intern dict', f'{oldValue} → {value}', f'{blockType}[{blockIdx}].{category}.{name}.{field}'))
+            console.debug(
+                formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{blockType}[{blockIdx}].{category}.{name}.{field}')
+            )
         return True
 
     def editDataBlockLoopParam(self, blockIdx, category, name, rowIndex, field, value):
@@ -737,11 +750,20 @@ class Model(QObject):
             return False
         self._dataBlocks[blockIdx]['loops'][category][rowIndex][name][field] = value
         if isinstance(value, float):
-            console.debug(formatMsg(
-            'sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'))
+            console.debug(
+                formatMsg(
+                    'sub',
+                    'Intern dict',
+                    f'{oldValue} → {value:.6f}',
+                    f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}',
+                )
+            )
         else:
-            console.debug(formatMsg(
-                'sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'))
+            console.debug(
+                formatMsg(
+                    'sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'
+                )
+            )
         return True
 
     def editCalculatorDictByMainParam(self, blockIdx, category, name, field, value):
@@ -777,8 +799,8 @@ class Model(QObject):
 
     def calculatorDictPathByMainParam(self, blockIdx, category, name, value):
         blockName = self._dataBlocks[blockIdx]['name']['value']
-        path = ['','','']
-        path[0] = f"crystal_{blockName}"
+        path = ['', '', '']
+        path[0] = f'crystal_{blockName}'
 
         # _cell
         if category == '_cell':
@@ -812,8 +834,8 @@ class Model(QObject):
 
     def calculatorDictPathByLoopParam(self, blockIdx, category, name, rowIndex, value):
         blockName = self._dataBlocks[blockIdx]['name']['value']
-        path = ['','','']
-        path[0] = f"crystal_{blockName}"
+        path = ['', '', '']
+        path[0] = f'crystal_{blockName}'
 
         # _atom_site
         if category == '_atom_site':
@@ -975,8 +997,8 @@ class Model(QObject):
 
     def updateCurrentModelStructView(self):
         self.setCurrentModelStructViewAtomsModel()
-        #self.setCurrentModelStructViewCellModel()
-        #self.setCurrentModelStructViewAxesModel()
+        # self.setCurrentModelStructViewCellModel()
+        # self.setCurrentModelStructViewAxesModel()
 
     def setCurrentModelStructViewCellModel(self):
         params = self._dataBlocks[self._currentIndex]['params']
@@ -985,23 +1007,24 @@ class Model(QObject):
         c = params['_cell']['length_c']['value']
         self._structViewCellModel = [
             # x
-            { "x": 0,     "y":-0.5*b, "z":-0.5*c, "rotx": 0, "roty": 0,  "rotz":-90, "len": a },
-            { "x": 0,     "y": 0.5*b, "z":-0.5*c, "rotx": 0, "roty": 0,  "rotz":-90, "len": a },
-            { "x": 0,     "y":-0.5*b, "z": 0.5*c, "rotx": 0, "roty": 0,  "rotz":-90, "len": a },
-            { "x": 0,     "y": 0.5*b, "z": 0.5*c, "rotx": 0, "roty": 0,  "rotz":-90, "len": a },
+            {'x': 0, 'y': -0.5 * b, 'z': -0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': -90, 'len': a},
+            {'x': 0, 'y': 0.5 * b, 'z': -0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': -90, 'len': a},
+            {'x': 0, 'y': -0.5 * b, 'z': 0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': -90, 'len': a},
+            {'x': 0, 'y': 0.5 * b, 'z': 0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': -90, 'len': a},
             # y
-            { "x":-0.5*a, "y": 0,     "z":-0.5*c, "rotx": 0, "roty": 0,  "rotz": 0,  "len": b },
-            { "x": 0.5*a, "y": 0,     "z":-0.5*c, "rotx": 0, "roty": 0,  "rotz": 0,  "len": b },
-            { "x":-0.5*a, "y": 0,     "z": 0.5*c, "rotx": 0, "roty": 0,  "rotz": 0,  "len": b },
-            { "x": 0.5*a, "y": 0,     "z": 0.5*c, "rotx": 0, "roty": 0,  "rotz": 0,  "len": b },
+            {'x': -0.5 * a, 'y': 0, 'z': -0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': 0, 'len': b},
+            {'x': 0.5 * a, 'y': 0, 'z': -0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': 0, 'len': b},
+            {'x': -0.5 * a, 'y': 0, 'z': 0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': 0, 'len': b},
+            {'x': 0.5 * a, 'y': 0, 'z': 0.5 * c, 'rotx': 0, 'roty': 0, 'rotz': 0, 'len': b},
             # z
-            { "x":-0.5*a, "y":-0.5*b, "z": 0,     "rotx": 0, "roty": 90, "rotz": 90, "len": c },
-            { "x": 0.5*a, "y":-0.5*b, "z": 0,     "rotx": 0, "roty": 90, "rotz": 90, "len": c },
-            { "x":-0.5*a, "y": 0.5*b, "z": 0,     "rotx": 0, "roty": 90, "rotz": 90, "len": c },
-            { "x": 0.5*a, "y": 0.5*b, "z": 0,     "rotx": 0, "roty": 90, "rotz": 90, "len": c },
+            {'x': -0.5 * a, 'y': -0.5 * b, 'z': 0, 'rotx': 0, 'roty': 90, 'rotz': 90, 'len': c},
+            {'x': 0.5 * a, 'y': -0.5 * b, 'z': 0, 'rotx': 0, 'roty': 90, 'rotz': 90, 'len': c},
+            {'x': -0.5 * a, 'y': 0.5 * b, 'z': 0, 'rotx': 0, 'roty': 90, 'rotz': 90, 'len': c},
+            {'x': 0.5 * a, 'y': 0.5 * b, 'z': 0, 'rotx': 0, 'roty': 90, 'rotz': 90, 'len': c},
         ]
         console.debug(
-            f"Structure view cell  for model no. {self._currentIndex + 1} has been set. Cell lengths: ({a}, {b}, {c})")
+            f'Structure view cell  for model no. {self._currentIndex + 1} has been set. Cell lengths: ({a}, {b}, {c})'
+        )
         self.structViewCellModelChanged.emit()
 
     def setCurrentModelStructViewAxesModel(self):
@@ -1010,19 +1033,20 @@ class Model(QObject):
         b = params['_cell']['length_b']['value']
         c = params['_cell']['length_c']['value']
         self._structViewAxesModel = [
-            {"x": 0.5, "y": 0,   "z": 0,   "rotx": 0, "roty":  0, "rotz": -90, "len": a},
-            {"x": 0,   "y": 0.5, "z": 0,   "rotx": 0, "roty":  0, "rotz":   0, "len": b},
-            {"x": 0,   "y": 0,   "z": 0.5, "rotx": 0, "roty": 90, "rotz":  90, "len": c}
+            {'x': 0.5, 'y': 0, 'z': 0, 'rotx': 0, 'roty': 0, 'rotz': -90, 'len': a},
+            {'x': 0, 'y': 0.5, 'z': 0, 'rotx': 0, 'roty': 0, 'rotz': 0, 'len': b},
+            {'x': 0, 'y': 0, 'z': 0.5, 'rotx': 0, 'roty': 90, 'rotz': 90, 'len': c},
         ]
         console.debug(
-            f"Structure view axes  for model no. {self._currentIndex + 1} has been set. Cell lengths: ({a}, {b}, {c})")
+            f'Structure view axes  for model no. {self._currentIndex + 1} has been set. Cell lengths: ({a}, {b}, {c})'
+        )
         self.structViewAxesModelChanged.emit()
 
     def setCurrentModelStructViewAtomsModel(self):
-        '''
+        """
         Create a list of atoms for structure view, using easycrystallography to calculate equivalent positions
-        '''
-        print("\nsetCurrentModelStructViewAtomsModel\n")
+        """
+        print('\nsetCurrentModelStructViewAtomsModel\n')
         structViewModel = set()
         if self._currentIndex == -1:
             self._structViewAtomsModel = []
@@ -1052,13 +1076,9 @@ class Model(QObject):
             zArray = self.wrap_into_unit_cell(zArray)
 
             for x, y, z in zip(xArray, yArray, zArray):
-                structViewModel.add((
-                    float(x),
-                    float(y),
-                    float(z),
-                    self.atomData(symbol, 'covalent_radius'),
-                    self.atomData(symbol, 'color')
-                ))
+                structViewModel.add(
+                    (float(x), float(y), float(z), self.atomData(symbol, 'covalent_radius'), self.atomData(symbol, 'color'))
+                )
         # Add those atoms, which have 0 in xyz to be translated into 1
         structViewModelCopy = copy.copy(structViewModel)
         for item in structViewModelCopy:
@@ -1089,10 +1109,12 @@ class Model(QObject):
             elif item[2] == 0:
                 structViewModel.add((item[0], item[1], 1, item[3], item[4]))
         # Create dict from set for GUI
-        self._structViewAtomsModel = [{'x':x, 'y':y, 'z':z, 'diameter':diameter, 'color':color}
-                                      for x, y, z, diameter, color in structViewModel]
-        console.debug(formatMsg('sub',
-                    f'{len(atoms)} atom(s)', f'model no. {self._currentIndex + 1}', 'for structure view', 'defined'))
+        self._structViewAtomsModel = [
+            {'x': x, 'y': y, 'z': z, 'diameter': diameter, 'color': color} for x, y, z, diameter, color in structViewModel
+        ]
+        console.debug(
+            formatMsg('sub', f'{len(atoms)} atom(s)', f'model no. {self._currentIndex + 1}', 'for structure view', 'defined')
+        )
         self.structViewAtomsModelChanged.emit()
 
     @staticmethod
@@ -1101,16 +1123,17 @@ class Model(QObject):
         return [(coord % 1) for coord in position]
 
     def phaseToModel(self, phase):
-        '''
+        """
         Convert the current phase to ED model representation
-        '''
+        """
         pass
 
     def jobToModel(self, job):
-        '''
+        """
         Convert the current job to ED model representation
-        '''
+        """
         pass
+
 
 class StructureViewWorker(QObject):
     finished = Signal()

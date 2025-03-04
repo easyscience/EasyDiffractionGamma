@@ -18,12 +18,14 @@ from Logic.Helpers import formatMsg
 
 try:
     from cryspy.procedure_rhochi.rhochi_by_dictionary import rhochi_calc_chi_sq_by_dictionary
+
     console.debug('CrysPy module imported')
 except ImportError:
     console.error('No CrysPy module found')
 
 
 SCALE = 1
+
 
 class Worker(QObject):
     finished = Signal()
@@ -38,29 +40,28 @@ class Worker(QObject):
         self._cryspyUsePrecalculatedData = False
         self._cryspyCalcAnalyticalDerivatives = False
 
-        #self._paramsInit = lmfit.Parameters()
+        # self._paramsInit = lmfit.Parameters()
         self._paramsFinal = lmfit.Parameters()
 
         self._gofPrevIter = None
         self._gofLastIter = None
 
-        #QThread.setTerminationEnabled()
+        # QThread.setTerminationEnabled()
 
     def run(self):
-
         def callbackFunc(params, iter, resid, *args, **kws):
             chiSq = np.sum(np.square(resid))
-            #pointsCount = resid.size
-            #freeParamsCount = len(params.valuesdict())
+            # pointsCount = resid.size
+            # freeParamsCount = len(params.valuesdict())
             self._proxy.fitting.chiSq = chiSq / (self._proxy.fitting._pointsCount - self._proxy.fitting._freeParamsCount)
             console.info(formatMsg('main', f'Iteration: {iter:5d}', f'Reduced Chi2: {self._proxy.fitting.chiSq:16g}'))
 
             # Check if fitting termination is requested
             if self._needCancel:
                 self._needCancel = False
-                #self._proxy.data._cryspyDict = copy.deepcopy(self._cryspyDictInitial)
+                # self._proxy.data._cryspyDict = copy.deepcopy(self._cryspyDictInitial)
                 console.error('Terminating the execution of the optimization thread')
-                #QThread.terminate()  # Not needed for Lmfit
+                # QThread.terminate()  # Not needed for Lmfit
                 return True  # Cancel minimization and return back to after lmfit.minimize
 
             # Update iteration number in the status bar
@@ -81,7 +82,6 @@ class Worker(QObject):
             return False  # Continue minimization
 
         def residFunc(params):
-
             # Update CrysPy dict from Lmfit params
             for param in params:
                 block, group, idx = Data.strToCalcDictParamPath(param)
@@ -92,7 +92,8 @@ class Worker(QObject):
                 self._interface.data()._cryspyDict,
                 dict_in_out=self._interface.data()._inOutDict,
                 flag_use_precalculated_data=self._cryspyUsePrecalculatedData,
-                flag_calc_analytical_derivatives=self._cryspyCalcAnalyticalDerivatives)
+                flag_calc_analytical_derivatives=self._cryspyCalcAnalyticalDerivatives,
+            )
 
             # Total residual
             totalResid = np.empty(0)
@@ -104,8 +105,9 @@ class Worker(QObject):
                 y_meas_array = cryspyInOutDict[cryspy_name]['signal_exp'][0]
                 sy_meas_array = cryspyInOutDict[cryspy_name]['signal_exp'][1]
                 y_bkg_array = cryspyInOutDict[cryspy_name]['signal_background']
-                y_calc_all_phases_array = cryspyInOutDict[cryspy_name]['signal_plus'] + \
-                                          cryspyInOutDict[cryspy_name]['signal_minus']
+                y_calc_all_phases_array = (
+                    cryspyInOutDict[cryspy_name]['signal_plus'] + cryspyInOutDict[cryspy_name]['signal_minus']
+                )
                 y_calc_all_phases_array_with_bkg = y_calc_all_phases_array + y_bkg_array
 
                 resid = (y_calc_all_phases_array_with_bkg - y_meas_array) / sy_meas_array
@@ -121,12 +123,13 @@ class Worker(QObject):
         # Preliminary calculations
         self._cryspyUsePrecalculatedData = False
         self._cryspyCalcAnalyticalDerivatives = False
-        #self._proxy.fitting.chiSq, self._proxy.fitting._pointsCount, _, _, freeParamNames = rhochi_calc_chi_sq_by_dictionary(
+        # self._proxy.fitting.chiSq, self._proxy.fitting._pointsCount, _, _, freeParamNames = rhochi_calc_chi_sq_by_dictionary(
         chiSq, pointsCount, _, _, freeParamNames = rhochi_calc_chi_sq_by_dictionary(
             self._interface.data()._cryspyDict,
             dict_in_out=self._interface.data()._inOutDict,
             flag_use_precalculated_data=self._cryspyUsePrecalculatedData,
-            flag_calc_analytical_derivatives=self._cryspyCalcAnalyticalDerivatives)
+            flag_calc_analytical_derivatives=self._cryspyCalcAnalyticalDerivatives,
+        )
 
         # Number of measured data points
         self._proxy.fitting._pointsCount = pointsCount
@@ -163,19 +166,15 @@ class Worker(QObject):
         self._proxy.fitting.chiSqStart = self._proxy.fitting.chiSq
         self._cryspyUsePrecalculatedData = True
         method = 'BFGS'
-        tol = 1e+3
+        tol = 1e3
         method = 'L-BFGS-B'
         tol = 1e-2
         method = self._proxy.fitting.minimizerMethod
         tol = self._proxy.fitting.minimizerTol
         reduce_fcn = None  # None : sum-of-squares of residual (default) = (r*r).sum()
-        result = lmfit.minimize(residFunc,
-                                paramsLmfit,
-                                args=(),
-                                method=method,
-                                reduce_fcn=reduce_fcn,
-                                iter_cb=callbackFunc,
-                                tol=tol)
+        result = lmfit.minimize(
+            residFunc, paramsLmfit, args=(), method=method, reduce_fcn=reduce_fcn, iter_cb=callbackFunc, tol=tol
+        )
 
         lmfit.report_fit(result)
 
@@ -187,12 +186,12 @@ class Worker(QObject):
             if result.aborted:
                 console.info('Optimization aborted')
                 self._proxy.status.fitStatus = 'Aborted'
-                #self.cancelled.emit()
+                # self.cancelled.emit()
             else:
                 console.info('Optimization failed')
                 self._proxy.status.fitStatus = 'Failure'
                 ## Restore cryspyDict from the state before minimization started
-                #self._proxy.data._cryspyDict = copy.deepcopy(self._cryspyDictInitial)
+                # self._proxy.data._cryspyDict = copy.deepcopy(self._cryspyDictInitial)
 
         # Update CrysPy dict with the best params after minimization finished/aborted/failed
         for param in result.params:
@@ -206,11 +205,12 @@ class Worker(QObject):
             self._interface.data()._cryspyDict,
             dict_in_out=self._interface.data()._inOutDict,
             flag_use_precalculated_data=self._cryspyUsePrecalculatedData,
-            flag_calc_analytical_derivatives=self._cryspyCalcAnalyticalDerivatives)
+            flag_calc_analytical_derivatives=self._cryspyCalcAnalyticalDerivatives,
+        )
         self._proxy.fitting.chiSq = chiSq / (self._proxy.fitting._pointsCount - self._proxy.fitting._freeParamsCount)
         console.info(
-            f"Optimal reduced chi2 per {self._proxy.fitting._pointsCount} points and "
-            f"{self._proxy.fitting._freeParamsCount} free params: {self._proxy.fitting.chiSq:.2f}"
+            f'Optimal reduced chi2 per {self._proxy.fitting._pointsCount} points and '
+            f'{self._proxy.fitting._freeParamsCount} free params: {self._proxy.fitting.chiSq:.2f}'
         )
         # NEED move to connection
         self._proxy.status.goodnessOfFit = f'{self._proxy.fitting.chiSqStart:0.2f} → {self._proxy.fitting.chiSq:0.2f}'
@@ -251,7 +251,7 @@ class Fitting(QObject):
         self._freeParamsCount = 0
 
         self._minimizerMethod = 'BFGS'
-        self._minimizerTol = 1e+3
+        self._minimizerTol = 1e3
 
         self._worker.finished.connect(self.setIsFittingNowToFalse)
         self._worker.finished.connect(self.fitFinished)
@@ -337,7 +337,7 @@ class Fitting(QObject):
         self.isFittingNow = False
 
 
-#https://stackoverflow.com/questions/30843876/using-qthreadpool-with-qrunnable-in-pyqt4
-#https://stackoverflow.com/questions/70868493/what-is-the-best-way-to-stop-interrupt-qrunnable-in-qthreadpool
-#https://stackoverflow.com/questions/24825441/stop-scipy-minimize-after-set-time
-#https://stackoverflow.com/questions/22390479/qrunnable-trying-to-abort-a-task
+# https://stackoverflow.com/questions/30843876/using-qthreadpool-with-qrunnable-in-pyqt4
+# https://stackoverflow.com/questions/70868493/what-is-the-best-way-to-stop-interrupt-qrunnable-in-qthreadpool
+# https://stackoverflow.com/questions/24825441/stop-scipy-minimize-after-set-time
+# https://stackoverflow.com/questions/22390479/qrunnable-trying-to-abort-a-task

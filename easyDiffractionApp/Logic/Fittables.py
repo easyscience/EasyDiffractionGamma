@@ -14,17 +14,17 @@ from Logic.Helpers import formatMsg
 
 _EMPTY_DATA = [
     {
-        "error": 0,
-        "fit": True,
-        "group": "",
-        "max": 1,
-        "min": -1,
-        "name": "",
-        "parentIndex": 0,
-        "parentName": "",
-        "unit": "",
-        "value": 0,
-        "enabeld": True
+        'error': 0,
+        'fit': True,
+        'group': '',
+        'max': 1,
+        'min': -1,
+        'name': '',
+        'parentIndex': 0,
+        'parentName': '',
+        'unit': '',
+        'value': 0,
+        'enabeld': True,
     }
 ]
 
@@ -60,12 +60,12 @@ class Fittables(QObject):
         self._fixedParamsCount = 0
         self._modelParamsCount = 0
         self._experimentParamsCount = 0
-        #self.dataChanged.emit()
-        console.debug("All fittables removed")
+        # self.dataChanged.emit()
+        console.debug('All fittables removed')
 
     @Property('QVariant', notify=dataChanged)
     def data(self):
-        #console.error('FITTABLES DATA GETTER')
+        # console.error('FITTABLES DATA GETTER')
         return self._data
 
     @Property(str, notify=dataJsonChanged)
@@ -81,7 +81,7 @@ class Fittables(QObject):
         if self._nameFilterCriteria == newValue:
             return
         self._nameFilterCriteria = newValue
-        console.debug(f"Fittables table filter criteria changed to {newValue}")
+        console.debug(f'Fittables table filter criteria changed to {newValue}')
         self.nameFilterCriteriaChanged.emit()
 
     @Property(str, notify=variabilityFilterCriteriaChanged)
@@ -93,7 +93,7 @@ class Fittables(QObject):
         if self._variabilityFilterCriteria == newValue:
             return
         self._variabilityFilterCriteria = newValue
-        console.debug(f"Fittables table variability filter criteria changed to {newValue}")
+        console.debug(f'Fittables table variability filter criteria changed to {newValue}')
         self.variabilityFilterCriteriaChanged.emit()
 
     @Property(float, notify=paramsCountChanged)
@@ -115,8 +115,9 @@ class Fittables(QObject):
     @Slot(str, int, str, int, str, str, float)
     def edit(self, blockType, blockIdx, category, rowIndex, name, field, value):
         if rowIndex == -1:
-            console.debug(formatMsg('main',
-                        'Changing fittable', f'{blockType}[{blockIdx}].{category}.{name}.{field} to {value}'))
+            console.debug(
+                formatMsg('main', 'Changing fittable', f'{blockType}[{blockIdx}].{category}.{name}.{field} to {value}')
+            )
             if blockType == 'experiment':
                 self._proxy.experiment.setMainParam(blockIdx, category, name, field, value)
                 # Update the job object
@@ -126,8 +127,11 @@ class Fittables(QObject):
                 # Update the job object
                 self._proxy.model.blocksToPhase(blockIdx, category, name, field, value)
         else:
-            console.debug(formatMsg('main', 'Changing fittable',
-                        f'{blockType}[{blockIdx}].{category}[{rowIndex}].{name}.{field} to {value}'))
+            console.debug(
+                formatMsg(
+                    'main', 'Changing fittable', f'{blockType}[{blockIdx}].{category}[{rowIndex}].{name}.{field} to {value}'
+                )
+            )
             if blockType == 'experiment':
                 self._proxy.experiment.setLoopParam(blockIdx, category, name, rowIndex, field, value)
                 self._proxy.experiment.blocksToLoopJob(blockIdx, category, name, rowIndex, field, value)
@@ -140,8 +144,9 @@ class Fittables(QObject):
         changedIntern = False
         changedCryspy = False
         if rowIndex == -1:
-            console.debug(formatMsg('main', 'Changing fittable',
-                        f'{blockType}[{blockIdx}].{category}.{name}.{field} to {value}'))
+            console.debug(
+                formatMsg('main', 'Changing fittable', f'{blockType}[{blockIdx}].{category}.{name}.{field} to {value}')
+            )
             if blockType == 'experiment':
                 # update exp model and job object
                 # NEED FIX. Temp solution to reset su
@@ -157,22 +162,26 @@ class Fittables(QObject):
                 # update cryspy model
                 changedCryspy = self._proxy.model.editCalculatorDictByMainParam(blockIdx, category, name, field, value)
         else:
-            console.debug(formatMsg('main', 'Changing fittable',
-                        f'{blockType}[{blockIdx}].{category}[{rowIndex}].{name}.{field} to {value}'))
+            console.debug(
+                formatMsg(
+                    'main', 'Changing fittable', f'{blockType}[{blockIdx}].{category}[{rowIndex}].{name}.{field} to {value}'
+                )
+            )
             if blockType == 'experiment':
                 # NEED FIX. Temp solution to reset su
                 self._proxy.experiment.editDataBlockLoopParam(blockIdx, category, name, rowIndex, 'error', 0)
-                changedIntern = self._proxy.experiment.editDataBlockLoopParam(
-                    blockIdx, category, name, rowIndex, field, value)
+                changedIntern = self._proxy.experiment.editDataBlockLoopParam(blockIdx, category, name, rowIndex, field, value)
                 changedCryspy = self._proxy.experiment.editCalcDictByLoopParam(
-                    blockIdx, category, name, rowIndex, field, value)
+                    blockIdx, category, name, rowIndex, field, value
+                )
             elif blockType == 'model':
                 # NEED FIX. Temp solution to reset su
                 self._proxy.model.editDataBlockLoopParam(blockIdx, category, name, rowIndex, 'error', 0)
                 changedIntern = self._proxy.model.editDataBlockLoopParam(blockIdx, category, name, rowIndex, field, value)
                 self._proxy.model.blocksToLoopPhase(blockIdx, category, name, rowIndex, field, value)
                 changedCryspy = self._proxy.model.editCalculatorDictByLoopParam(
-                    blockIdx, category, name, rowIndex, field, value)
+                    blockIdx, category, name, rowIndex, field, value
+                )
         if changedIntern and changedCryspy:
             if blockType == 'model':
                 self.modelChangedSilently.emit()
@@ -197,19 +206,20 @@ class Fittables(QObject):
                         fittable = {}
                         fittable['blockType'] = 'model'
                         fittable['blockIdx'] = i
-                        fittable['blockName'] = block['name'] #['value']
+                        fittable['blockName'] = block['name']  # ['value']
                         # fittable['blockIcon'] = block['name']['icon']
-                        fittable['blockIcon'] = "layer-group"
+                        fittable['blockIcon'] = 'layer-group'
                         fittable['category'] = paramContent['category']
-                        fittable['prettyCategory'] = paramContent['prettyCategory'] \
-                            if 'prettyCategory' in paramContent else ''
+                        fittable['prettyCategory'] = paramContent['prettyCategory'] if 'prettyCategory' in paramContent else ''
                         fittable['name'] = paramContent['name']
                         fittable['prettyName'] = paramContent['prettyName'] if 'prettyName' in paramContent else ''
-                        fittable['shortPrettyName'] = paramContent['shortPrettyName'] \
-                            if 'shortPrettyName' in paramContent else ''
-                        fittable['icon'] = paramContent['icon'] if 'icon' in paramContent else "map-marker-alt"
-                        fittable['categoryIcon'] = paramContent['categoryIcon'] \
-                            if 'categoryIcon' in paramContent else "layer-group"
+                        fittable['shortPrettyName'] = (
+                            paramContent['shortPrettyName'] if 'shortPrettyName' in paramContent else ''
+                        )
+                        fittable['icon'] = paramContent['icon'] if 'icon' in paramContent else 'map-marker-alt'
+                        fittable['categoryIcon'] = (
+                            paramContent['categoryIcon'] if 'categoryIcon' in paramContent else 'layer-group'
+                        )
                         fittable['enabled'] = paramContent['enabled']
                         fittable['value'] = paramContent['value']
                         fittable['error'] = paramContent['error']
@@ -227,8 +237,7 @@ class Fittables(QObject):
                             fittable['from'] = max(fittable['value'] * (100 - pctDelta) / 100, fittable['min'])
                             fittable['to'] = min(fittable['value'] * (100 + pctDelta) / 100, fittable['max'])
 
-                        fullName = \
-                            f"{fittable['blockType']}.{fittable['blockName']}.{fittable['category']}.{fittable['name']}"
+                        fullName = f'{fittable["blockType"]}.{fittable["blockName"]}.{fittable["category"]}.{fittable["name"]}'
                         if fittable['enabled']:
                             _modelParamsCount += 1
                             if fittable['fit']:
@@ -253,21 +262,24 @@ class Fittables(QObject):
                             fittable = {}
                             fittable['blockType'] = 'model'
                             fittable['blockIdx'] = i
-                            fittable['blockName'] = block['name']# ['value']
+                            fittable['blockName'] = block['name']  # ['value']
                             # fittable['blockIcon'] = block['name']['icon']
-                            fittable['blockIcon'] = "layer-group"
+                            fittable['blockIcon'] = 'layer-group'
                             fittable['category'] = category
-                            fittable['prettyCategory'] = paramContent['prettyCategory'] \
-                                if 'prettyCategory' in paramContent else ''
+                            fittable['prettyCategory'] = (
+                                paramContent['prettyCategory'] if 'prettyCategory' in paramContent else ''
+                            )
                             fittable['rowName'] = paramContent['rowName'] if 'rowName' in paramContent else ''
                             fittable['rowIndex'] = rowIndex
                             fittable['name'] = paramContent['name']
                             fittable['prettyName'] = paramContent['prettyName'] if 'prettyName' in paramContent else ''
-                            fittable['shortPrettyName'] = paramContent['shortPrettyName'] \
-                                if 'shortPrettyName' in paramContent else ''
-                            fittable['icon'] = paramContent['icon'] if 'icon' in paramContent else "map-marker-alt"
-                            fittable['categoryIcon'] = paramContent['categoryIcon'] \
-                                if 'categoryIcon' in paramContent else "layer-group"
+                            fittable['shortPrettyName'] = (
+                                paramContent['shortPrettyName'] if 'shortPrettyName' in paramContent else ''
+                            )
+                            fittable['icon'] = paramContent['icon'] if 'icon' in paramContent else 'map-marker-alt'
+                            fittable['categoryIcon'] = (
+                                paramContent['categoryIcon'] if 'categoryIcon' in paramContent else 'layer-group'
+                            )
                             fittable['enabled'] = paramContent['enabled']
                             fittable['value'] = paramContent['value']
                             fittable['error'] = paramContent['error']
@@ -286,9 +298,9 @@ class Fittables(QObject):
                                 fittable['to'] = min(fittable['value'] * (100 + pctDelta) / 100, fittable['max'])
 
                                 fullName = (
-                                f"{fittable['blockType']}.{fittable['blockName']}.{fittable['category']}"
-                                f".{fittable['rowName']}.{fittable['name']}"
-                            )
+                                    f'{fittable["blockType"]}.{fittable["blockName"]}.{fittable["category"]}'
+                                    f'.{fittable["rowName"]}.{fittable["name"]}'
+                                )
                             if fittable['enabled']:
                                 _modelParamsCount += 1
                                 if fittable['fit']:
@@ -342,8 +354,7 @@ class Fittables(QObject):
                             fittable['from'] = max(fittable['value'] * (100 - pctDelta) / 100, fittable['min'])
                             fittable['to'] = min(fittable['value'] * (100 + pctDelta) / 100, fittable['max'])
 
-                        fullName = \
-                            f"{fittable['blockType']}.{fittable['blockName']}.{fittable['category']}.{fittable['name']}"
+                        fullName = f'{fittable["blockType"]}.{fittable["blockName"]}.{fittable["category"]}.{fittable["name"]}'
                         if fittable['enabled']:
                             _experimentParamsCount += 1
                             if fittable['fit']:
@@ -397,8 +408,8 @@ class Fittables(QObject):
                                 fittable['to'] = min(fittable['value'] * (100 + pctDelta) / 100, fittable['max'])
 
                             fullName = (
-                                f"{fittable['blockType']}.{fittable['blockName']}.{fittable['category']}"
-                                f".{fittable['rowName']}.{fittable['name']}"
+                                f'{fittable["blockType"]}.{fittable["blockName"]}.{fittable["category"]}'
+                                f'.{fittable["rowName"]}.{fittable["name"]}'
                             )
                             if fittable['enabled']:
                                 _experimentParamsCount += 1
@@ -428,5 +439,5 @@ class Fittables(QObject):
 
     def setDataJson(self):
         self._dataJson = Converter.dictToJson(self._data)
-        console.debug(" - Fittables converted to JSON string")
+        console.debug(' - Fittables converted to JSON string')
         self.dataJsonChanged.emit()

@@ -12,26 +12,31 @@ import toml
 
 ### Get value from pyproject.toml
 
+
 def conf():
     project_fname = 'pyproject.toml'
     current_path = os.path.dirname(__file__)
     project_fpath = os.path.join(current_path, project_fname)
     return toml.load(project_fpath)
 
+
 def keyPath():
     if len(sys.argv) < 2:
         return ''
     return sys.argv[1]
 
+
 def getValue(d, element):
     keys = element.split('.')
-    keys[-1] = keys[-1].split('-')[0] # macos-latest -> macos, etc.
+    keys[-1] = keys[-1].split('-')[0]  # macos-latest -> macos, etc.
     rv = d
     for key in keys:
         rv = rv[key]
     return rv
 
+
 ### Update pyproject.toml
+
 
 def extraDict():
     python_packages_path = os.path.dirname(pip.__path__[0]).replace('\\', '/')
@@ -55,18 +60,28 @@ def extraDict():
     release_tag = f'v{app_version}'
     release_title = f'Version {app_version} ({build_date})'
 
-    return { 'ci': { 'cache': { 'python_packages_path': python_packages_path },
-                     'app': { 'info': { 'build_date': build_date,
-                                        'date_for_qtifw': date_for_qtifw,
-                                        'release_tag': release_tag,
-                                        'release_title': release_title,
-                                        'branch_name': branch_name,
-                                        'branch_url': branch_url,
-                                        'commit_sha_short': commit_sha_short,
-                                        'commit_url': commit_url } } } }
+    return {
+        'ci': {
+            'cache': {'python_packages_path': python_packages_path},
+            'app': {
+                'info': {
+                    'build_date': build_date,
+                    'date_for_qtifw': date_for_qtifw,
+                    'release_tag': release_tag,
+                    'release_title': release_title,
+                    'branch_name': branch_name,
+                    'branch_url': branch_url,
+                    'commit_sha_short': commit_sha_short,
+                    'commit_url': commit_url,
+                }
+            },
+        }
+    }
+
 
 def extraToml():
     return toml.dumps(extraDict())
+
 
 def updatePyprojectToml():
     with open('pyproject.toml', 'r', encoding='utf-8') as f:
@@ -75,7 +90,9 @@ def updatePyprojectToml():
     with open('pyproject.toml', 'w', encoding='utf-8') as f:
         f.write(pyproject_toml)
 
+
 ### Main
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -87,6 +104,7 @@ def main():
         print(value)
     if args.update:
         updatePyprojectToml()
+
 
 if __name__ == '__main__':
     main()
