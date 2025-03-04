@@ -3,6 +3,7 @@
 # © 2023 Contributors to the EasyDiffraction project <https://github.com/easyscience/EasyDiffraction>
 
 import sys
+
 from EasyApp.Logic.Logging import console
 
 EASYAPP_LOCAL_PATH = '../../EasyApp'
@@ -36,8 +37,8 @@ if __name__ == '__main__':
         engine.addImportPath(p)
     console.debug('Resource paths exposed to QML')
 
-    from PySide6.QtQml import qmlRegisterType
     from EasyApp.Logic.Maintenance import Updater
+    from PySide6.QtQml import qmlRegisterType
     qmlRegisterType(Updater, 'EasyApp.Logic.Maintenance', 1, 0, 'Updater')
     console.debug('Updater type registered instantiation in QML')
 
@@ -62,7 +63,7 @@ if __name__ == '__main__':
     from Logic.PyProxy import PyProxy
     pyproxy = PyProxy()
     engine.rootContext().setContextProperty('pyProxy', pyproxy)
-    
+
     if not engine.rootObjects():
         sys.exit(-1)
     console.debug('QML engine has root component')

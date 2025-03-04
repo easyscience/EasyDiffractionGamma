@@ -2,20 +2,23 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # © 2021-2023 Contributors to the easyDiffraction project <https://github.com/easyScience/easyDiffractionApp>
 
-from PySide6.QtCore import Signal, QObject, QThread, Property, Slot
+# from easyscience import globad_object as borg
+from distutils.util import strtobool
+from threading import Thread
+from typing import Callable
+from typing import List
 
 import numpy as np
-from typing import Callable, List
-
-from threading import Thread
-
 from EasyApp.Logic.Logging import console
+from easyscience.Constraints import NumericConstraint
+from easyscience.Constraints import ObjConstraint
 from easyscience.fitting.fitter import Fitter as CoreFitter
 from easyscience.Utils.io.xml import XMLSerializer
-from easyscience.Constraints import ObjConstraint, NumericConstraint
-# from easyscience import globad_object as borg
-
-from distutils.util import strtobool
+from PySide6.QtCore import Property
+from PySide6.QtCore import QObject
+from PySide6.QtCore import QThread
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 
 
 def _defaultFitResults():
@@ -356,7 +359,8 @@ class Fitting(QObject):
         # if independent_par_idx == -1:
         #    print(f"Add constraint: {self.fitablesList()[dependent_par_idx]['label']}{relational_operator}{value}")
         # else:
-        #    print(f"Add constraint: {self.fitablesList()[dependent_par_idx]['label']}{relational_operator}{value}{arithmetic_operator}{self.fitablesList()[independent_par_idx]['label']}")
+        #    print(f"Add constraint: {self.fitablesList()[dependent_par_idx]['label']}{relational_operator}{value}"
+        #    "{arithmetic_operator}{self.fitablesList()[independent_par_idx]['label']}")
         pars = [par for par in self.fitter.fit_object.get_parameters() if par.enabled]
         if arithmetic_operator != "" and independent_par_idx > -1:
             c = ObjConstraint(pars[dependent_par_idx],

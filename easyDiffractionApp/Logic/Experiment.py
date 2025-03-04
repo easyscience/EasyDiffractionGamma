@@ -2,23 +2,27 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # © 2023 Contributors to the EasyDiffraction project <https://github.com/easyscience/EasyDiffraction>
 
-import os
 import copy
-import numpy as np
+import os
 import pathlib
 
-from PySide6.QtCore import QObject, Signal, Slot, Property
-from PySide6.QtCore import QFile, QTextStream, QIODevice
-from PySide6.QtQml import QJSValue
+import numpy as np
 
+# from easydiffraction.Jobs import get_job_from_cif_string
+from EasyApp.Logic.Logging import console
 from easydiffraction.calculators.cryspy.parser import Parameter
 from easydiffraction.io.cif import dataBlockToCif
-from Logic.Helpers import formatMsg
-# from easydiffraction.Jobs import get_job_from_cif_string
+from PySide6.QtCore import Property
+from PySide6.QtCore import QFile
+from PySide6.QtCore import QIODevice
+from PySide6.QtCore import QObject
+from PySide6.QtCore import QTextStream
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtQml import QJSValue
 
-from EasyApp.Logic.Logging import console
 from Logic.Data import Data
-
+from Logic.Helpers import formatMsg
 
 _DEFAULT_DATA_BLOCK_NO_MEAS_TOF = """data_pnd
 
@@ -689,7 +693,7 @@ class Experiment(QObject):
                                 fittable = True,
                                 fit = not job.parameters.sigma2.fixed
                             ))
-        # 
+        #
         # _pd_meas
         category = '_pd_meas'
         dataBlock[param][category] = {}
@@ -959,7 +963,10 @@ class Experiment(QObject):
         # self._proxy.data._calcDict[calcDictBlockName] = calcExperimentsDict[calcDictBlockName]
         # self._dataBlocksNoMeas[self.currentIndex] = edExperimentsNoMeas[0]
 
-        console.debug(f"Experiment data block '{currentExperimentName}' (no. {self.currentIndex + 1}) (without measured data) has been replaced")
+        console.debug(
+            f"Experiment data block '{currentExperimentName}' (no. {self.currentIndex + 1}) "
+            "(without measured data) has been replaced"
+        )
         self.dataBlocksNoMeasChanged.emit()  # self.dataBlocksNoMeasChanged.emit(blockIdx)
 
     @Slot(int)
@@ -1091,11 +1098,14 @@ class Experiment(QObject):
         self.blocksToJob(blockIdx, category, name, field, value)
 
         if isinstance(value, float):
-            console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{block}[{blockIdx}].{category}.{name}.{field}'))
+            console.debug(formatMsg(
+                'sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{block}[{blockIdx}].{category}.{name}.{field}'
+            ))
         else:
-            console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}.{name}.{field}'))
+            console.debug(formatMsg(
+                'sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}.{name}.{field}'
+            ))
         return True
-
     def editDataBlockLoopParam(self, blockIdx, category, name, rowIndex, field, value):
         block = 'experiment'
         oldValue = self._dataBlocksNoMeas[blockIdx]['loops'][category][rowIndex][name][field]
@@ -1107,11 +1117,14 @@ class Experiment(QObject):
         self.blocksToLoopJob(blockIdx, category, name, rowIndex, field, value)
 
         if isinstance(value, float):
-            console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'))
+            console.debug(formatMsg(
+                'sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'
+            ))
         else:
-            console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'))
+            console.debug(formatMsg(
+                'sub', 'Intern dict', f'{oldValue} → {value}', f'{block}[{blockIdx}].{category}[{rowIndex}].{name}.{field}'
+            ))
         return True
-
     def blocksToJob(self, blockIdx, category, name, field, value):
         """
         Update the job object with new values defined
@@ -1699,7 +1712,8 @@ class Experiment(QObject):
             console.debug(formatMsg('sub', 'Y-meas', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
         except IndexError:
             self._yMeasArrays.append(yMeasArray)
-            console.debug(formatMsg('sub', 'Y-meas', f'experiment no. {len(self._yMeasArrays)}', 'to intern dataset', 'added'))
+            console.debug(
+                formatMsg('sub', 'Y-meas', f'experiment no. {len(self._yMeasArrays)}', 'to intern dataset', 'added'))
         self.yMeasArraysChanged.emit()
 
     def setSYMeasArray(self, syMeasArray, idx):
@@ -1708,7 +1722,8 @@ class Experiment(QObject):
             console.debug(formatMsg('sub', 'sY-meas', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
         except IndexError:
             self._syMeasArrays.append(syMeasArray)
-            console.debug(formatMsg('sub', 'sY-meas', f'experiment no. {len(self._syMeasArrays)}', 'to intern dataset', 'added'))
+            console.debug(
+                formatMsg('sub', 'sY-meas', f'experiment no. {len(self._syMeasArrays)}', 'to intern dataset', 'added'))
 
     def setYBkgArray(self, yBkgArray, idx):
         try:
@@ -1716,7 +1731,8 @@ class Experiment(QObject):
             console.debug(formatMsg('sub', 'Y-bkg (inter)', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
         except IndexError:
             self._yBkgArrays.append(yBkgArray)
-            console.debug(formatMsg('sub', 'Y-bkg (inter)', f'experiment no. {len(self._yBkgArrays)}', 'to intern dataset', 'added'))
+            console.debug(formatMsg(
+                'sub', 'Y-bkg (inter)', f'experiment no. {len(self._yBkgArrays)}', 'to intern dataset', 'added'))
         self.yBkgArraysChanged.emit()
 
     def setYCalcTotalArray(self, yCalcTotalArray, idx):
@@ -1725,16 +1741,19 @@ class Experiment(QObject):
             console.debug(formatMsg('sub', 'Y-calc (total)', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
         except IndexError:
             self._yCalcTotalArrays.append(yCalcTotalArray)
-            console.debug(formatMsg('sub', 'Y-calc (total)', f'experiment no. {len(self._yCalcTotalArrays)}', 'to intern dataset', 'added'))
+            console.debug(formatMsg(
+                'sub', 'Y-calc (total)', f'experiment no. {len(self._yCalcTotalArrays)}', 'to intern dataset', 'added'))
         self.yCalcTotalArraysChanged.emit()
 
     def setYResidArray(self, yResidArray, idx):
         try:
             self._yResidArrays[idx] = yResidArray
-            console.debug(formatMsg('sub', 'Y-resid (meas-calc)', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
+            console.debug(formatMsg(
+                'sub', 'Y-resid (meas-calc)', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
         except IndexError:
             self._yResidArrays.append(yResidArray)
-            console.debug(formatMsg('sub', 'Y-resid (meas-calc)', f'experiment no. {len(self._yResidArrays)}', 'to intern dataset', 'added'))
+            console.debug(formatMsg(
+                'sub', 'Y-resid (meas-calc)', f'experiment no. {len(self._yResidArrays)}', 'to intern dataset', 'added'))
         self.yResidArraysChanged.emit()
 
     def setXBraggDict(self, xBraggDict, idx):
@@ -1743,7 +1762,8 @@ class Experiment(QObject):
             console.debug(formatMsg('sub', 'X-Bragg (peaks)', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
         except IndexError:
             self._xBraggDicts.append(xBraggDict)
-            console.debug(formatMsg('sub', 'X-Bragg (peaks)', f'experiment no. {len(self._xBraggDicts)}', 'to intern dataset', 'added'))
+            console.debug(formatMsg(
+                'sub', 'X-Bragg (peaks)', f'experiment no. {len(self._xBraggDicts)}', 'to intern dataset', 'added'))
         self.xBraggDictsChanged.emit()
 
     def setChartRanges(self, ranges, idx):
@@ -1752,23 +1772,27 @@ class Experiment(QObject):
             console.debug(formatMsg('sub', 'Chart ranges', f'experiment no. {idx + 1}', 'in intern dataset', 'replaced'))
         except IndexError:
             self._chartRanges.append(ranges)
-            console.debug(formatMsg('sub', 'Chart ranges', f'experiment no. {len(self._chartRanges)}', 'to intern dataset', 'added'))
+            console.debug(formatMsg(
+                'sub', 'Chart ranges', f'experiment no. {len(self._chartRanges)}', 'to intern dataset', 'added'))
         self.chartRangesChanged.emit()
 
     def setDataBlocksCifNoMeas(self):
         self._dataBlocksCifNoMeas = [dataBlockToCif(block) for block in self._dataBlocksNoMeas]
-        console.debug(formatMsg('sub', f'{len(self._dataBlocksCifNoMeas)} experiment(s)', 'without meas data', 'to CIF string', 'converted'))
+        console.debug(formatMsg(
+            'sub', f'{len(self._dataBlocksCifNoMeas)} experiment(s)', 'without meas data', 'to CIF string', 'converted'))
         self.dataBlocksCifNoMeasChanged.emit()
 
     def setDataBlocksCifMeasOnly(self):
         self._dataBlocksCifMeasOnly = [dataBlockToCif(block, includeBlockName=False) for block in self._dataBlocksMeasOnly]
-        console.debug(formatMsg('sub', f'{len(self._dataBlocksCifMeasOnly)} experiment(s)', 'meas data only', 'to CIF string', 'converted'))
+        console.debug(formatMsg(
+            'sub', f'{len(self._dataBlocksCifMeasOnly)} experiment(s)', 'meas data only', 'to CIF string', 'converted'))
         self.dataBlocksCifMeasOnlyChanged.emit()
 
     def setDataBlocksCif(self):
         self.setDataBlocksCifNoMeas()
         self.setDataBlocksCifMeasOnly()
-        cifMeasOnlyReduced =  [block.split('\n')[:10] + ['...'] + block.split('\n')[-6:] for block in self._dataBlocksCifMeasOnly]
+        cifMeasOnlyReduced =  [block.split('\n')[:10] + ['...'] +
+                               block.split('\n')[-6:] for block in self._dataBlocksCifMeasOnly]
         cifMeasOnlyReduced = ['\n'.join(block) for block in cifMeasOnlyReduced]
         cifMeasOnlyReduced = [f'\n{block}' for block in cifMeasOnlyReduced]
         cifMeasOnlyReduced = [block.rstrip() for block in cifMeasOnlyReduced]
@@ -1776,7 +1800,8 @@ class Experiment(QObject):
         cifMeasOnlyReduced[0] = cifMeasOnlyReduced[0].split('[')[0]
 
         meas_string = [block.split('\n')[-1] for block in self._dataBlocksCifMeasOnly][-1]
-        self._dataBlocksCif = [[noMeas, measOnlyReduced] for (noMeas, measOnlyReduced) in zip(self._dataBlocksCifNoMeas, cifMeasOnlyReduced)]
+        self._dataBlocksCif = [[noMeas, measOnlyReduced] for
+                               (noMeas, measOnlyReduced) in zip(self._dataBlocksCifNoMeas, cifMeasOnlyReduced)]
 
         import re
         # Extract the three lists using regex
@@ -1795,7 +1820,8 @@ class Experiment(QObject):
                 values += f"{ae[i]:<6} {be[i]:<8} {ce[i]:<6}\n"
             self._dataBlocksCif[0].extend([values])
 
-        console.debug(formatMsg('sub', f'{len(self._dataBlocksCif)} experiment(s)', 'simplified meas data', 'to CIF string', 'converted'))
+        console.debug(formatMsg('sub',
+                f'{len(self._dataBlocksCif)} experiment(s)', 'simplified meas data', 'to CIF string', 'converted'))
         self.dataBlocksCifChanged.emit()
 
     # Function to parse numbers, ignoring "..."

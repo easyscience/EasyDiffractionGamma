@@ -5,16 +5,22 @@
 import os
 import time
 from pathlib import Path
-from gemmi import cif
-from PySide6.QtCore import QObject, Signal, Slot, Property, QUrl
-from PySide6.QtCore import QFile, QTextStream, QIODevice
 
-from easydiffraction.calculators.cryspy.parser import Parameter
-from easydiffraction.io.cif import dataBlockToCif
 # from easydiffraction.io.cif import cifV2ToV1
 from EasyApp.Logic.Logging import console
-from Logic.Helpers import formatMsg
+from easydiffraction.calculators.cryspy.parser import Parameter
+from easydiffraction.io.cif import dataBlockToCif
+from gemmi import cif
+from PySide6.QtCore import Property
+from PySide6.QtCore import QFile
+from PySide6.QtCore import QIODevice
+from PySide6.QtCore import QObject
+from PySide6.QtCore import QTextStream
+from PySide6.QtCore import QUrl
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 
+from Logic.Helpers import formatMsg
 
 _EMPTY_DATA = {
     'name': '',
@@ -285,12 +291,14 @@ class Project(QObject):
         self.location = os.path.dirname(fpath)
 
         modelFileNames = [item['cif_file_name']['value'] for item in self._dataBlock['loops']['_model']]
-        modelFilePaths = [os.path.join(self._location, self._dirNames['models'], fileName) for fileName in modelFileNames]
+        modelFilePaths = [os.path.join(
+            self._location, self._dirNames['models'], fileName) for fileName in modelFileNames]
         self._proxy.model.loadModelsFromResources(modelFilePaths)
 
         if '_experiment' in self._dataBlock['loops']:
             experimentFileNames = [item['cif_file_name']['value'] for item in self._dataBlock['loops']['_experiment']]
-            experimentFilePaths = [os.path.join(self._location, self._dirNames['experiments'], fileName) for fileName in experimentFileNames]
+            experimentFilePaths = [os.path.join(
+                self._location, self._dirNames['experiments'], fileName) for fileName in experimentFileNames]
             self._proxy.experiment.loadExperimentsFromResources(experimentFilePaths)
 
         reportFileName = 'report.cif'
@@ -327,13 +335,15 @@ class Project(QObject):
         self.location = os.path.dirname(fpath)
 
         modelFileNames = [item['cif_file_name']['value'] for item in self._dataBlock['loops']['_model']]
-        modelFilePaths = [os.path.join(self._location, self._dirNames['models'], fileName) for fileName in modelFileNames]
+        modelFilePaths = [os.path.join(
+            self._location, self._dirNames['models'], fileName) for fileName in modelFileNames]
         modelFilePaths = [QUrl.fromLocalFile(path) for path in modelFilePaths]
         self._proxy.model.loadModelsFromFiles(modelFilePaths)
 
         if '_experiment' in self._dataBlock['loops']:
             experimentFileNames = [item['cif_file_name']['value'] for item in self._dataBlock['loops']['_experiment']]
-            experimentFilePaths = [os.path.join(self._location, self._dirNames['experiments'], fileName) for fileName in experimentFileNames]
+            experimentFilePaths = [os.path.join(
+                self._location, self._dirNames['experiments'], fileName) for fileName in experimentFileNames]
             experimentFilePaths = [QUrl.fromLocalFile(path) for path in experimentFilePaths]
             self._proxy.experiment.loadExperimentsFromFiles(experimentFilePaths)
 
@@ -384,7 +394,8 @@ class Project(QObject):
         names = [f"{block['name']['value']}" for block in self._proxy.experiment.dataBlocksNoMeas]
         oldNames = []
         if '_experiment' in self._dataBlock['loops']:
-            oldNames = [os.path.splitext(item['cif_file_name']['value'])[0] for item in self._dataBlock['loops']['_experiment']]
+            oldNames = [os.path.splitext(
+                item['cif_file_name']['value'])[0] for item in self._dataBlock['loops']['_experiment']]
         if oldNames == names:
             return
 
@@ -415,9 +426,11 @@ class Project(QObject):
             return False
         self._dataBlock['params'][category][name][field] = value
         if isinstance(value, float):
-            console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value:.6f}', f'{blockType}.{category}.{name}.{field}'))
+            console.debug(formatMsg('sub', 'Intern dict',
+                        f'{oldValue} → {value:.6f}', f'{blockType}.{category}.{name}.{field}'))
         else:
-            console.debug(formatMsg('sub', 'Intern dict', f'{oldValue} → {value}', f'{blockType}.{category}.{name}.{field}'))
+            console.debug(formatMsg('sub', 'Intern dict',
+                        f'{oldValue} → {value}', f'{blockType}.{category}.{name}.{field}'))
         return True
 
     @Slot()
@@ -456,8 +469,11 @@ class Project(QObject):
 
         if self._proxy.experiment.defined:
             experimentFileNames = [item['cif_file_name']['value'] for item in self._dataBlock['loops']['_experiment']]
-            experimentFilePaths = [os.path.join(projectDirPath, self._dirNames['experiments'], fileName) for fileName in experimentFileNames]
-            for (experimentFilePath, dataBlockCifNoMeas, dataBlockCifMeasOnly) in zip(experimentFilePaths, self._proxy.experiment.dataBlocksCifNoMeas, self._proxy.experiment.dataBlocksCifMeasOnly):
+            experimentFilePaths = [os.path.join(projectDirPath, self._dirNames['experiments'], fileName) \
+                                   for fileName in experimentFileNames]
+            for (experimentFilePath, dataBlockCifNoMeas, dataBlockCifMeasOnly) \
+                in zip(experimentFilePaths, self._proxy.experiment.dataBlocksCifNoMeas,
+                       self._proxy.experiment.dataBlocksCifMeasOnly):
                 os.makedirs(os.path.dirname(experimentFilePath), exist_ok=True)
                 dataBlockCif = dataBlockCifNoMeas + '\n\n' + dataBlockCifMeasOnly
                 with open(experimentFilePath, 'w') as file:

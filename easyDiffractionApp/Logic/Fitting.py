@@ -3,19 +3,21 @@
 # © © 2023 Contributors to the EasyDiffraction project <https://github.com/easyscience/EasyDiffractionApp>
 
 import copy
+
 import lmfit
-
 import numpy as np
-
-from PySide6.QtCore import QObject, Signal, Slot, Property, QThreadPool
-
 from EasyApp.Logic.Logging import console
-from Logic.Helpers import formatMsg
+from PySide6.QtCore import Property
+from PySide6.QtCore import QObject
+from PySide6.QtCore import QThreadPool
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+
 from Logic.Data import Data
+from Logic.Helpers import formatMsg
 
 try:
-    from cryspy.procedure_rhochi.rhochi_by_dictionary import \
-        rhochi_calc_chi_sq_by_dictionary
+    from cryspy.procedure_rhochi.rhochi_by_dictionary import rhochi_calc_chi_sq_by_dictionary
     console.debug('CrysPy module imported')
 except ImportError:
     console.error('No CrysPy module found')
@@ -132,8 +134,10 @@ class Worker(QObject):
         # Number of free parameters
         self._proxy.fitting._freeParamsCount = len(freeParamNames)
         if self._proxy.fitting._freeParamsCount != self._proxy.fittables._freeParamsCount:
-            console.error(f'Number of free parameters differs. Expected {self._proxy.fittables._freeParamsCount}, got {self._proxy.fitting._freeParamsCount}')
-
+            console.error(
+                f'Number of free parameters differs. Expected {self._proxy.fittables._freeParamsCount}, '
+                f'got {self._proxy.fitting._freeParamsCount}'
+            )
         # Reduced chi-squared goodness-of-fit (GOF)
         self._proxy.fitting.chiSq = chiSq / (self._proxy.fitting._pointsCount - self._proxy.fitting._freeParamsCount)
 
@@ -141,7 +145,8 @@ class Worker(QObject):
         freeParamValuesStart = [self._interface.data()._cryspyDict[way[0]][way[1]][way[2]] for way in freeParamNames]
         paramsLmfit = lmfit.Parameters()
         for cryspyParamPath, val in zip(freeParamNames, freeParamValuesStart):
-            lmfitParamName = Data.calcDictParamPathToStr(cryspyParamPath)  # Only ascii letters and numbers allowed for lmfit.Parameters()???
+            # Only ascii letters and numbers allowed for lmfit.Parameters()???
+            lmfitParamName = Data.calcDictParamPathToStr(cryspyParamPath)
             left = self._proxy.model.paramValueByFieldAndCrypyParamPath('min', cryspyParamPath)
             if left is None:
                 left = self._proxy.experiment.paramValueByFieldAndCrypyParamPath('min', cryspyParamPath)
@@ -203,8 +208,12 @@ class Worker(QObject):
             flag_use_precalculated_data=self._cryspyUsePrecalculatedData,
             flag_calc_analytical_derivatives=self._cryspyCalcAnalyticalDerivatives)
         self._proxy.fitting.chiSq = chiSq / (self._proxy.fitting._pointsCount - self._proxy.fitting._freeParamsCount)
-        console.info(f"Optimal reduced chi2 per {self._proxy.fitting._pointsCount} points and {self._proxy.fitting._freeParamsCount} free params: {self._proxy.fitting.chiSq:.2f}")
-        self._proxy.status.goodnessOfFit = f'{self._proxy.fitting.chiSqStart:0.2f} → {self._proxy.fitting.chiSq:0.2f}'  # NEED move to connection
+        console.info(
+            f"Optimal reduced chi2 per {self._proxy.fitting._pointsCount} points and "
+            f"{self._proxy.fitting._freeParamsCount} free params: {self._proxy.fitting.chiSq:.2f}"
+        )
+        # NEED move to connection
+        self._proxy.status.goodnessOfFit = f'{self._proxy.fitting.chiSqStart:0.2f} → {self._proxy.fitting.chiSq:0.2f}'
         self._proxy.fitting.chiSqSignificantlyChanged.emit()
 
         # Update internal dicts with the best params

@@ -3,10 +3,16 @@
 # © 2023 Contributors to the EasyDiffraction project <https://github.com/easyscience/EasyDiffraction>
 
 import os
-from PySide6.QtCore import QObject, Signal, Slot, Property
-from PySide6.QtCore import QFile, QTextStream, QIODevice
 
 from EasyApp.Logic.Logging import console
+from PySide6.QtCore import Property
+from PySide6.QtCore import QFile
+from PySide6.QtCore import QIODevice
+from PySide6.QtCore import QObject
+from PySide6.QtCore import QTextStream
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+
 from Logic.Helpers import formatMsg
 
 try:

@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # © 2021-2023 Contributors to the easyDiffraction project <https://github.com/easyScience/easyDiffractionApp>
 
+import argparse
+import datetime
 import os
 import sys
-import datetime
-import argparse
+
 import pip
 import toml
-
 
 ### Get value from pyproject.toml
 

@@ -3,16 +3,21 @@
 # © 2023 Contributors to the EasyDiffraction project <https://github.com/easyscience/EasyDiffraction>
 
 import argparse
-import orjson
 import os
 import pathlib
 import sys
 
-from PySide6.QtCore import Qt, QObject, QCoreApplication, QUrl, Signal, Slot, Property
-from PySide6.QtWidgets import QApplication
-
+import orjson
 from EasyApp.Logic.Logging import console
 from easydiffraction.io.cif import toStdDevSmallestPrecision as toStdDevSmallestPrecisionLib
+from PySide6.QtCore import Property
+from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
+from PySide6.QtCore import QUrl
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QApplication
 
 
 class PersistentSettingsHandler:
@@ -96,7 +101,10 @@ class EnvironmentVariables:
         # misc
         #qsetenv("QT_QPA_PLATFORM", "windows:darkmode=[1|2]")
         #os.environ['QT_QPA_PLATFORM'] = 'windows:darkmode=[1|2]'
-        #os.environ['QT_MESSAGE_PATTERN'] = "\033[32m%{time h:mm:ss.zzz}%{if-category}\033[32m %{category}:%{endif} %{if-debug}\033[34m%{function}%{endif}%{if-warning}\033[31m%{backtrace depth=3}%{endif}%{if-critical}\033[31m%{backtrace depth=3}%{endif}%{if-fatal}\033[31m%{backtrace depth=3}%{endif}\033[0m %{message}"
+        #os.environ['QT_MESSAGE_PATTERN'] =
+        # "\033[32m%{time h:mm:ss.zzz}%{if-category}\033[32m %{category}:%{endif}
+        # %{if-debug}\033[34m%{function}%{endif}%{if-warning}\033[31m%{backtrace depth=3}%{endif}%{if-critical}\033
+        # [31m%{backtrace depth=3}%{endif}%{if-fatal}\033[31m%{backtrace depth=3}%{endif}\033[0m %{message}"
 
 
 class WebEngine:

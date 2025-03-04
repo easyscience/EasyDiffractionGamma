@@ -3,14 +3,18 @@
 # © 2023 Contributors to the EasyDiffraction project <https://github.com/easyscience/EasyDiffraction>
 
 import numpy as np
-from PySide6.QtCore import QObject, Signal, Slot, Property, Qt
-from PySide6.QtGui import QImage, QBrush
-from PySide6 import QtCharts # noqa: F401
-
 from EasyApp.Logic.Logging import console
+from PySide6 import QtCharts  # noqa: F401
+from PySide6.QtCore import Property
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtGui import QBrush
+from PySide6.QtGui import QImage
+
 # from Logic.Helpers import Converter #, WebEngine
 from Logic.Helpers import formatMsg
-
 
 _LIBS_1D = ['QtCharts', 'Plotly']
 
@@ -271,7 +275,8 @@ class Plotting(QObject):
                 yBraggArray = np.full_like(xBraggArray, -phaseIdx * 0.5)
                 braggSerie = self._chartRefs['QtCharts']['analysisPage']['braggSeries'][phaseName]
                 braggSerie.replaceNp(xBraggArray, yBraggArray)
-                console.debug(formatMsg('sub', f'Bragg peaks {phaseName}', f'{xBraggArray.size} points', 'on analysis page', 'replaced'))
+                console.debug(formatMsg('sub',
+                        f'Bragg peaks {phaseName}', f'{xBraggArray.size} points', 'on analysis page', 'replaced'))
         except IndexError:
             pass
 
