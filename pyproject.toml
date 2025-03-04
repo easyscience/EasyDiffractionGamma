@@ -103,7 +103,8 @@ file_ext = { macos = '.icns', ubuntu = '.png', windows = '.ico' }
 [ci.app.setup]
 build_dir_suffix = 'Setup'
 repository_dir_suffix = 'Repos'
-os = { macos = 'macOS', ubuntu = 'Linux', windows = 'Windows' }                                                     # Should be the same as GH actions ${{ runner.os }}
+# Should be the same as GH actions ${{ runner.os }}
+os = { macos = 'macOS', ubuntu = 'Linux', windows = 'Windows' }
 arch = { macos = 'x64', ubuntu = 'x64', windows = 'x64' }
 file_ext = { macos = '.app', ubuntu = '', windows = '.exe' }
 maintenance_tool_suffix = 'MaintenanceTool'

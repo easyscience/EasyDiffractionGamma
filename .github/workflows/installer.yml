@@ -29,11 +29,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Python dependencies
-        # Install 'validate-pyproject' for checking pyproject.toml
-        # Install 'ruff' for code linting and formatting
-        # Install 'nbqa' for quality assurance of Jupyter notebooks
-        run: pip install 'validate-pyproject[all]' ruff nbqa
+      # - name: Install Python dependencies
+      #   # Install 'validate-pyproject' for checking pyproject.toml
+      #   # Install 'ruff' for code linting and formatting
+      #   # Install 'nbqa' for quality assurance of Jupyter notebooks
+      #   run: pip install 'validate-pyproject[all]' ruff nbqa
 
       - name: Install npm dependencies
         # Install 'prettier' for code formatting of Markdown, YAML, etc. files
