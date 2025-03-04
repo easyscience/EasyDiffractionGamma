@@ -2,46 +2,39 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // © 2021-2022 Contributors to the easyDiffraction project <https://github.com/easyScience/easyDiffractionApp>
 
-function Controller()
-{
-}
+function Controller() {}
 
-Controller.prototype.IntroductionPageCallback = function()
-{
+Controller.prototype.IntroductionPageCallback = function () {
   var page = gui.currentPageWidget()
-  if (page != null)
-  {
-    if (installer.isInstaller())
-    {
-      var msg = ""
-      msg += "<p>Welcome to the EasyDiffraction Setup Wizard.</p>"
-      msg += "<p>EasyDiffraction is a scientific software for modelling and analysis of diffraction data.</p>"
-      msg += "<p>For more details, please visit <a href=\"https://easydiffraction.org\">https://easydiffraction.org</a></p>"
+  if (page != null) {
+    if (installer.isInstaller()) {
+      var msg = ''
+      msg += '<p>Welcome to the EasyDiffraction Setup Wizard.</p>'
+      msg +=
+        '<p>EasyDiffraction is a scientific software for modelling and analysis of diffraction data.</p>'
+      msg +=
+        '<p>For more details, please visit <a href="https://easydiffraction.org">https://easydiffraction.org</a></p>'
       page.MessageLabel.setText(msg)
     }
-    if (installer.isUninstaller())
-    {
+    if (installer.isUninstaller()) {
       //gui.clickButton(buttons.NextButton)
     }
-    if (installer.isUpdater())
-    {
+    if (installer.isUpdater()) {
       //gui.clickButton(buttons.NextButton)
     }
   }
 }
 
-Controller.prototype.LicenseAgreementPageCallback = function()
-{
+Controller.prototype.LicenseAgreementPageCallback = function () {
   //console.log("* enter LicenseAgreementPage")
   //var page = gui.currentPageWidget()
   //if (page != null)
   //{
-    //page.AcceptLicenseRadioButton.setChecked(true)
+  //page.AcceptLicenseRadioButton.setChecked(true)
   //}
 }
 
-Controller.prototype.FinishedPageCallback = function()
-{
+Controller.prototype.FinishedPageCallback = function () {
   //console.log("* buttons, buttons.CommitButton:", buttons, buttons.CommitButton)
   // Try to hide 'Restart' button on the 'Finished' page
   // 1: doesn't work - TypeError: Property 'hide' of object 2 is not a function

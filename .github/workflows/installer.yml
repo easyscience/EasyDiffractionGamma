@@ -3,12 +3,95 @@ name: Build Installer
 on:
   push:
     branches:
-      - "**"
+      - '**'
   pull_request:
     branches:
-      - "**"
+      - '**'
 
 jobs:
+  # Job 1: Check code quality and consistency
+  code-quality:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.12']
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0' # full history with tags to get the version number by versioningit
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Python dependencies
+        # Install 'validate-pyproject' for checking pyproject.toml
+        # Install 'ruff' for code linting and formatting
+        # Install 'nbqa' for quality assurance of Jupyter notebooks
+        run: pip install 'validate-pyproject[all]' ruff nbqa
+
+      - name: Install npm dependencies
+        # Install 'prettier' for code formatting of Markdown, YAML, etc. files
+        # Install 'prettier-plugin-toml' plugin for code formatting of TOML files
+        run: npm install prettier prettier-plugin-toml --save-dev --save-exact
+
+      # Check the validity of pyproject.toml
+      - name: Check validity of pyproject.toml
+        id: check_pyproject
+        continue-on-error: true
+        run: validate-pyproject pyproject.toml
+
+      # Check code linting with Ruff in the project root
+      - name: Check code linting
+        id: check_code_linting
+        continue-on-error: true
+        run: ruff check .
+
+      - name: Suggestion to fix code linting issues (for *.py files)
+        if: steps.check_code_linting.outcome == 'failure'
+        run:
+          echo "In project root run 'ruff check . --fix' and commit changes to
+          fix issues."
+
+      # Check code formatting with Ruff in the project root
+      - name: Check code formatting
+        id: check_code_formatting
+        continue-on-error: true
+        run: ruff format . --check
+
+      - name: Suggestion to fix code formatting issues (for *.py files)
+        if: steps.check_code_formatting.outcome == 'failure'
+        run:
+          echo "In project root run 'ruff format .' and commit changes to fix
+          issues."
+
+      # Check formatting of Markdown, YAML, TOML, etc. files with Prettier in the project root
+      - name: Check formatting of Markdown, YAML, TOML, etc. files
+        id: check_others_formatting
+        continue-on-error: true
+        run: npx prettier . --check --config=prettierrc.toml
+
+      - name: Suggestion to fix non-code formatting issues (for *.md, etc.)
+        if: steps.check_others_formatting.outcome == 'failure'
+        run:
+          echo "In project root run 'npx prettier . --write
+          --config=prettierrc.toml' and commit changes to fix issues."
+
+      - name: Force fail if any of the previous steps failed
+        if: |
+          steps.check_pyproject.outcome == 'failure' ||
+          steps.check_code_linting.outcome == 'failure' ||
+          steps.check_code_formatting.outcome == 'failure' || 
+          steps.check_notebooks.outcome == 'failure' || 
+          steps.check_others_formatting.outcome == 'failure'
+        run: exit 1
+
+  # Job 2: Build the installer
   build-installer:
     timeout-minutes: 80
 
@@ -17,7 +100,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, windows-2022, macos-13, macos-14]  # [ubuntu-22.04, windows-2022, macos-13, flyci-macos-14-m2]
+        os: [ubuntu-22.04, ubuntu-24.04, windows-2022, macos-13, macos-14] # [ubuntu-22.04, windows-2022, macos-13, flyci-macos-14-m2]
 
     steps:
       - name: Check-out repository
@@ -26,7 +109,7 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v5
         with:
-            python-version: 3.11
+          python-version: 3.11
 
       - name: Upgrade package installer for Python
         run: python -m pip install --upgrade pip
@@ -75,7 +158,9 @@ jobs:
           echo "SETUP_EXE_PATH=$(python ${{ env.SCRIPTS_PATH }}/Config.py ${{ env.BRANCH_NAME }} ${{ matrix.os }} setup_exe_path)" >> $GITHUB_ENV
 
       - name: Create python resources file
-        run: pyside6-rcc ${{ env.PACKAGE_PATH }}/resources.qrc -o ${{ env.PACKAGE_PATH }}/resources.py
+        run:
+          pyside6-rcc ${{ env.PACKAGE_PATH }}/resources.qrc -o ${{
+          env.PACKAGE_PATH }}/resources.py
 
       - name: Set up screen (Linux)
         if: runner.os == 'Linux'
@@ -102,7 +187,7 @@ jobs:
       #    screenresolution set 1920x1080x32@30
       #    screenresolution get
       - name: Set up screen (macOS, not flyci)
-        if: matrix.os == 'macos-13'  # runner.os == 'macOS'
+        if: matrix.os == 'macos-13' # runner.os == 'macOS'
         run: |
           system_profiler SPDisplaysDataType | grep Resolution
 
@@ -123,8 +208,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-installer_screenshots_${{ matrix.os }}  # desired name (without .zip) of the zip file to be uploaded
-          path: |  # all files from these paths are zipped into file with name from above
+          name: build-installer_screenshots_${{ matrix.os }} # desired name (without .zip) of the zip file to be uploaded
+          path:
+            | # all files from these paths are zipped into file with name from above
             tests/gui/screenshots
             .tests/image_diff
           if-no-files-found: 'error'
@@ -135,18 +221,18 @@ jobs:
 
       - name: Create offline app installer from freezed app bundle with QtIFW
         run: >
-          python ${{ env.SCRIPTS_PATH }}/MakeInstaller.py
-          ${{ env.BRANCH_NAME }} ${{ matrix.os }}
+          python ${{ env.SCRIPTS_PATH }}/MakeInstaller.py ${{ env.BRANCH_NAME }}
+          ${{ matrix.os }}
 
       - name: Sign, notarize and staple offline app installer (macOS)
         if: |
           runner.os == 'macOS' && github.event_name == 'push' &&
           (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop')
         run: >
-          python ${{ env.SCRIPTS_PATH }}/SignAppInstaller.py
-          ${{ env.BRANCH_NAME }} ${{ matrix.os }}
-          ${{ secrets.APPLE_CERT_DATA }} ${{ secrets.APPLE_CERT_PASSWORD }}
-          ${{ secrets.APPLE_NOTARY_USER }} ${{ secrets.APPLE_NOTARY_PASSWORD }}
+          python ${{ env.SCRIPTS_PATH }}/SignAppInstaller.py ${{ env.BRANCH_NAME
+          }} ${{ matrix.os }} ${{ secrets.APPLE_CERT_DATA }} ${{
+          secrets.APPLE_CERT_PASSWORD }} ${{ secrets.APPLE_NOTARY_USER }} ${{
+          secrets.APPLE_NOTARY_PASSWORD }}
 
       - name: Sign offline app installer (Windows)
         if: |
@@ -163,19 +249,21 @@ jobs:
 
       - name: Create zip archive of offline app installer for distribution
         run: >
-          python ${{ env.SCRIPTS_PATH }}/ZipAppInstaller.py
-          ${{ env.BRANCH_NAME }} ${{ matrix.os }}
+          python ${{ env.SCRIPTS_PATH }}/ZipAppInstaller.py ${{ env.BRANCH_NAME
+          }} ${{ matrix.os }}
 
       - name: Upload double-zipped offline app installer for the next job step
         uses: actions/upload-artifact@v4
         with:
-          name: zipped-app-installer_${{ matrix.os }}-${{ runner.arch }}  # zip of another zip
+          name: zipped-app-installer_${{ matrix.os }}-${{ runner.arch }} # zip of another zip
           path: ${{ env.DISTRIBUTION_PATH }}/*.zip
-          compression-level: 0  # no compression
+          compression-level: 0 # no compression
           if-no-files-found: error
           retention-days: 10
 
-      - name: Upload zipped offline app installer to GitHub releases (non-master branch)
+      - name:
+          Upload zipped offline app installer to GitHub releases (non-master
+          branch)
         if: github.event_name == 'push' && env.BRANCH_NAME != 'master'
         uses: ncipollo/release-action@v1
         with:
@@ -184,12 +272,13 @@ jobs:
           allowUpdates: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "${{ env.DISTRIBUTION_PATH }}/*.zip"
+          artifacts: '${{ env.DISTRIBUTION_PATH }}/*.zip'
           tag: ${{ env.BRANCH_NAME }}
           name: ${{ env.BRANCH_NAME }}
-          bodyFile: "RELEASE.md"
+          bodyFile: 'RELEASE.md'
 
-      - name: Upload zipped offline app installer to GitHub releases (master branch)
+      - name:
+          Upload zipped offline app installer to GitHub releases (master branch)
         if: github.event_name == 'push' && env.BRANCH_NAME == 'master'
         uses: ncipollo/release-action@v1
         with:
@@ -198,10 +287,10 @@ jobs:
           allowUpdates: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "${{ env.DISTRIBUTION_PATH }}/*.zip"
+          artifacts: '${{ env.DISTRIBUTION_PATH }}/*.zip'
           tag: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TITLE }}
-          bodyFile: "RELEASE.md"
+          bodyFile: 'RELEASE.md'
 
       #- name: Upload online app installer to repository via FTP (master branch)
       #  if: github.event_name == 'push' && env.BRANCH_NAME == 'master'
@@ -210,6 +299,7 @@ jobs:
       #    ${{ env.BRANCH_NAME }} ${{ matrix.os }}
       #    ${{ secrets.APP_REPO_FTP_PASSWORD }}
 
+  # Job 3: Test the installer
   test-installer:
     needs: build-installer
 
@@ -220,7 +310,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, windows-2022, macos-13, macos-14]  # [ubuntu-22.04, windows-2022, macos-13, flyci-macos-14-m2]
+        os: [ubuntu-22.04, ubuntu-24.04, windows-2022, macos-13, macos-14] # [ubuntu-22.04, windows-2022, macos-13, flyci-macos-14-m2]
 
     steps:
       - name: Check-out repository
@@ -229,7 +319,7 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v5
         with:
-            python-version: 3.11
+          python-version: 3.11
 
       - name: Upgrade package installer for Python
         run: python -m pip install --upgrade pip
@@ -282,7 +372,7 @@ jobs:
       #    screenresolution set 1920x1080x32@30
       #    screenresolution get
       - name: Set up screen (macOS, not flyci)
-        if: matrix.os == 'macos-13'  # runner.os == 'macOS'
+        if: matrix.os == 'macos-13' # runner.os == 'macOS'
         run: |
           system_profiler SPDisplaysDataType | grep Resolution
 
@@ -292,15 +382,16 @@ jobs:
           Set-DisplayResolution -Width 1920 -Height 1080 -Force
           Get-DisplayResolution
 
-      - name: Download zipped offline app installer from from the previous job step
+      - name:
+          Download zipped offline app installer from from the previous job step
         uses: actions/download-artifact@v4
         with:
-          name: zipped-app-installer_${{ matrix.os }}-${{ runner.arch }}  # zip of another zip
+          name: zipped-app-installer_${{ matrix.os }}-${{ runner.arch }} # zip of another zip
 
       - name: Unzip archive with offline app installer for distribution
         run: >
-          python ${{ env.SCRIPTS_PATH }}/UnzipAppInstaller.py
-          ${{ env.BRANCH_NAME }} ${{ matrix.os }}
+          python ${{ env.SCRIPTS_PATH }}/UnzipAppInstaller.py ${{
+          env.BRANCH_NAME }} ${{ matrix.os }}
 
       - name: Make dir for .desktop file (Linux)
         if: runner.os == 'Linux'
@@ -308,26 +399,27 @@ jobs:
 
       - name: Install app
         run: >
-          python ${{ env.SCRIPTS_PATH }}/InstallApp.py
-          ${{ env.BRANCH_NAME }} ${{ matrix.os }}
+          python ${{ env.SCRIPTS_PATH }}/InstallApp.py ${{ env.BRANCH_NAME }}
+          ${{ matrix.os }}
 
       - name: Check app istallation is done
         run: python ${{ env.SCRIPTS_PATH }}/CheckAppExists.py
 
       - name: Run app in testmode and quit (macOS & Linux)
-        if: runner.os != 'Windows'  # disabled because it can't exit app and one can't see what is going on there (no GitHub logging)...
+        if: runner.os != 'Windows' # disabled because it can't exit app and one can't see what is going on there (no GitHub logging)...
         run: python ${{ env.SCRIPTS_PATH }}/RunApp.py --testmode
 
       - name: Run screenshots comparison tests
-        if: runner.os != 'Windows'  # disabled as didn't run app in test in the previous step
+        if: runner.os != 'Windows' # disabled as didn't run app in test in the previous step
         run: pytest tests/gui --color=yes
 
       - name: Upload zipped GUI tests screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-installer_screenshots_${{ matrix.os }}  # desired name (without .zip) of the zip file to be uploaded
-          path: |  # all files from these paths are zipped into file with name from above
+          name: test-installer_screenshots_${{ matrix.os }} # desired name (without .zip) of the zip file to be uploaded
+          path:
+            | # all files from these paths are zipped into file with name from above
             tests/gui/screenshots
             .tests/image_diff
           if-no-files-found: 'error'

@@ -5,11 +5,11 @@ body {
 }
 
 h1 {
-  color: #ddd
+  color: #ddd;
 }
 
 a {
-  color: #4ec1ef
+  color: #4ec1ef;
 }
 a:link {
   text-decoration: none;
@@ -39,5 +39,7 @@ a:active {
   border-width: 1px;
   border-color: #ccc;
   border-radius: 4px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  box-shadow:
+    0 4px 8px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
