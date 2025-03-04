@@ -20,10 +20,10 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Development Status :: 4 - Beta",
 ]
-requires-python = ">=3.8,<3.13"
+requires-python = ">=3.9,<3.13"
 dependencies = [
-  'numpy<2',
-  'scipy<1.14',
+  'numpy',
+  'scipy',
   'orjson',
   'lmfit',
   'orjson',
@@ -33,7 +33,7 @@ dependencies = [
   'numdifftools',
   'funcy',
   'cryspy @ git+https://github.com/ikibalin/cryspy.git@beta',
-  'EasyApp @ git+https://github.com/easyscience/EasyApp.git@develop',
+  'EasyApp @ git+https://github.com/easyscience/EasyApp.git@pyside6.8',
   'easyDiffraction @ git+https://github.com/easyscience/EasyDiffractionLib.git@new_param',
 ]
 
