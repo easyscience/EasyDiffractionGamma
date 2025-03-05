@@ -449,8 +449,9 @@ class Project(QObject):
             experimentFilePaths = [
                 os.path.join(projectDirPath, self._dirNames['experiments'], fileName) for fileName in experimentFileNames
             ]
+            data = [self._proxy.experiment.dataBlocksCifMeasFull()]
             for experimentFilePath, dataBlockCifNoMeas, dataBlockCifMeasOnly in zip(
-                experimentFilePaths, self._proxy.experiment.dataBlocksCifNoMeas, self._proxy.experiment.dataBlocksCifMeasOnly
+                experimentFilePaths, self._proxy.experiment.dataBlocksCifNoMeas, data
             ):
                 os.makedirs(os.path.dirname(experimentFilePath), exist_ok=True)
                 dataBlockCif = dataBlockCifNoMeas + '\n\n' + dataBlockCifMeasOnly

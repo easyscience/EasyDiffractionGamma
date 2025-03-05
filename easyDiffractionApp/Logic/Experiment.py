@@ -1013,9 +1013,6 @@ class Experiment(QObject):
         edRangeCif = f'_pd_meas.2theta_range_min {range_min}\n_pd_meas.2theta_range_max {range_max}'
         edCifNoMeas += '\n\n' + edRangeCif
 
-        # edCifMeasOnly = dataBlockToCif(self.dataBlocksMeasOnly[self.currentIndex],
-        #                                             includeBlockName=False)
-
         edCif = edCifNoMeas  # + '\n\n' + edCifMeasOnly
 
         blocks = self._interface.replaceExpCif(edCif, currentExperimentName)
@@ -1882,6 +1879,29 @@ class Experiment(QObject):
             )
         )
         self.dataBlocksCifMeasOnlyChanged.emit()
+
+    def dataBlocksCifMeasFull(self, index=0):
+        cif = ''
+        loop = 'loop_\n'
+        meas = '_pd_meas'
+        if self.job.type.is_tof:
+            x_string = 'time_of_flight'
+        else:
+            x_string = '2theta_scan'
+        y_string = 'intensity_total'
+        e_string = 'intensity_total_su'
+        cif += f'{loop}{meas}.{x_string}\n'
+        cif += f'{meas}.{y_string}\n'
+        cif += f'{meas}.{e_string}\n'
+        try:
+            x = self._dataBlocksMeasOnly[index]['loops']['_pd_meas'][0][x_string]['value']
+            y = self._dataBlocksMeasOnly[index]['loops']['_pd_meas'][0][y_string]['value']
+            e = self._dataBlocksMeasOnly[index]['loops']['_pd_meas'][0][e_string]['value']
+            for i in range(len(x)):
+                cif += f'{x[i]:<8.4f} {y[i]:<8.4f} {e[i]:<8.4f}\n'
+        except KeyError:
+            console.error('No measured data found')
+        return cif
 
     def setDataBlocksCif(self):
         self.setDataBlocksCifNoMeas()
