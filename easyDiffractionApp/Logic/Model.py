@@ -231,12 +231,45 @@ class Model(QObject):
         self._currentIndex = len(self.phases) - 1
         # convert phase into dataBlocks
         dataBlocks = self.phaseToBlocks(self.phases)
+        # apply cryspy constraints, if present
+        if hasattr(self._interface.data(), '_cryspyObj'):
+            self.applyCryspyConstraints(dataBlocks)
         self._dataBlocks.append(dataBlocks)
         self.defined = bool(len(self._dataBlocks))
 
         self.setDataBlocksCif()
         self.updateCifOnInterface()
         self.dataBlocksChanged.emit()
+
+    def applyCryspyConstraints(self, dataBlocks):
+        """
+        Apply constraints from the cryspy object to the dataBlocks
+        """
+        cryspyObj = self._interface.data()._cryspyObj
+        if cryspyObj is None:
+            return
+        # cell constraints
+        dataBlocks['params']['_cell']['angle_alpha']['enabled'] = not cryspyObj[0]['cell'].angle_alpha_constraint
+        dataBlocks['params']['_cell']['angle_beta']['enabled'] = not cryspyObj[0]['cell'].angle_beta_constraint
+        dataBlocks['params']['_cell']['angle_gamma']['enabled'] = not cryspyObj[0]['cell'].angle_gamma_constraint
+        dataBlocks['params']['_cell']['length_a']['enabled'] = not cryspyObj[0]['cell'].length_a_constraint
+        dataBlocks['params']['_cell']['length_b']['enabled'] = not cryspyObj[0]['cell'].length_b_constraint
+        dataBlocks['params']['_cell']['length_c']['enabled'] = not cryspyObj[0]['cell'].length_c_constraint
+        # fractional coordinates constraints
+        a_x = []
+        a_y = []
+        a_z = []
+        for atom in cryspyObj[0]['atom_site']:
+            a_x.append(atom.fract_x_constraint)
+            a_y.append(atom.fract_y_constraint)
+            a_z.append(atom.fract_z_constraint)
+
+        for i, atom in enumerate(dataBlocks['loops']['_atom_site']):
+            atom['fract_x']['enabled'] = not a_x[i]
+            atom['fract_y']['enabled'] = not a_y[i]
+            atom['fract_z']['enabled'] = not a_z[i]
+
+        return
 
     def updateCifOnInterface(self):
         """
