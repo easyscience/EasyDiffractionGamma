@@ -758,6 +758,8 @@ class Experiment(QObject):
             name_inc = '2theta_range_inc'
             x_name = job.name + '_' + job.experiment.name + '_tth'
         xmin = job.datastore.store[x_name].data[0]
+        if job.type.is_tof:
+            xmin = int(xmin)
         dataBlock[param][category][name_min] = dict(
             Parameter(
                 str(xmin),
@@ -771,6 +773,8 @@ class Experiment(QObject):
             )
         )
         xmax = job.datastore.store[x_name].data[-1]
+        if job.type.is_tof:
+            xmax = int(xmax)
         dataBlock[param][category][name_max] = dict(
             Parameter(
                 str(xmax),
@@ -785,7 +789,9 @@ class Experiment(QObject):
         )
         # inc = (xmax-xmin)/len(job.datastore.store[x_name].data)
         # 2nd point - 1st point (to change later)
-        inc = job.datastore.store[x_name].data[1] - xmin
+        #inc = job.datastore.store[x_name].data[1] - xmin
+        inc = np.abs(job.datastore.store[x_name].data[-1] - job.datastore.store[x_name].data[0])
+        inc = inc / len(job.datastore.store[x_name].data)
         inc = round(inc, 4)
         dataBlock[param][category][name_inc] = dict(
             Parameter(
@@ -1744,7 +1750,10 @@ class Experiment(QObject):
         modelNames = [key[12:] for key in calcInOutDict[calc_block_name].keys() if 'dict_in_out' in key]
         xBraggDict = {}
         for modelName in modelNames:
-            x_bragg_array = calcInOutDict[calc_block_name][f'dict_in_out_{modelName}'][f'{x_array_name}_hkl']
+            hkl_string = f'{modelName}_hkl'
+            if hkl_string not in calcInOutDict[calc_block_name][f'dict_in_out_{modelName}']:
+                continue
+            x_bragg_array = calcInOutDict[calc_block_name][f'dict_in_out_{modelName}'][hkl_string]
             if diffrn_radiation_type == 'cwl':
                 x_bragg_array = np.rad2deg(x_bragg_array)
             xBraggDict[modelName] = x_bragg_array
