@@ -403,12 +403,15 @@ class Model(QObject):
                 'name': 'type_symbol',
                 'category': category,
                 'idx': idx,
+                'enabled': False,
             }
             atomDict['label'] = self.fromDescriptorObject(atom.label)
             atomDict['label']['idx'] = idx
             atomDict['label']['shortPrettyName'] = 'label'
             atomDict['label']['name'] = 'label'
             atomDict['label']['category'] = category
+            atomDict['label']['fittable'] = False
+            atomDict['label']['enabled'] = False
             params = 'fract_x'
             atomDict[params] = self.fromParameterObject(atom.fract_x)
             atomDict[params]['shortPrettyName'] = 'x'

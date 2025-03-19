@@ -1013,7 +1013,7 @@ class Experiment(QObject):
         edRangeCif = f'_pd_meas.2theta_range_min {range_min}\n_pd_meas.2theta_range_max {range_max}'
         edCifNoMeas += '\n\n' + edRangeCif
 
-        edCif = edCifNoMeas  # + '\n\n' + edCifMeasOnly
+        edCif = edCifNoMeas + '\n\n' + self.dataBlocksCifMeasFull()
 
         blocks = self._interface.replaceExpCif(edCif, currentExperimentName)
         self._dataBlocksNoMeas[self.currentIndex] = blocks
