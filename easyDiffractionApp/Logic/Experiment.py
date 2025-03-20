@@ -789,7 +789,7 @@ class Experiment(QObject):
         )
         # inc = (xmax-xmin)/len(job.datastore.store[x_name].data)
         # 2nd point - 1st point (to change later)
-        #inc = job.datastore.store[x_name].data[1] - xmin
+        # inc = job.datastore.store[x_name].data[1] - xmin
         inc = np.abs(job.datastore.store[x_name].data[-1] - job.datastore.store[x_name].data[0])
         inc = inc / len(job.datastore.store[x_name].data)
         inc = round(inc, 4)
@@ -1714,10 +1714,8 @@ class Experiment(QObject):
         diffrn_radiation_type = self.dataBlocksNoMeas[idx]['params']['_diffrn_radiation']['type']['value']
         if diffrn_radiation_type == 'cwl':
             experiment_prefix = 'pd'
-            x_array_name = 'ttheta'
         elif diffrn_radiation_type == 'tof':
             experiment_prefix = 'tof'
-            x_array_name = 'time'
 
         ed_name = self._job.experiment.name
         calc_block_name = f'{experiment_prefix}_{ed_name}'

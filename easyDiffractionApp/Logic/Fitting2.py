@@ -46,6 +46,8 @@ class Fitting(QObject):
     currentMinimizerChanged = Signal()
     minimizerMethodChanged = Signal()
     currentCalculatorChanged = Signal()
+    minimizerTolChanged = Signal()
+    minimizerMaxIterChanged = Signal()
     finished = Signal()
     failed = Signal(str)
     constraintsRemoved = Signal()
@@ -56,7 +58,7 @@ class Fitting(QObject):
 
         self.parent = proxy
         self.interface = interface
-        self.fitter = CoreFitter(self.parent.experiment.job, self.interface.fit_func)
+        self.fitter = self.parent.model.job.analysis._fitter
         self.bridge = BackendBridge()
 
         # Multithreading
@@ -67,13 +69,35 @@ class Fitting(QObject):
         self.res = None
         self.is_fitting_now = False
         self._current_minimizer_method_index = 0
-        # self._current_minimizer_method_name = self.fitter.available_interfaces()[0]  # noqa: E501
-        self._current_minimizer_method_name = 'least_squares'
+        self._minimizerMaxIter = 500
+        self._minimizerTol = 1e-5
+        # self._current_minimizer_method_name = 'least_squares'
+        self._current_minimizer_method_name = 'leastsq'
         self.currentMinimizerChanged.connect(self.onCurrentMinimizerChanged)
 
         self.fit_thread = Thread(target=self.fit_threading, args=(self.bridge,))
         self.finished.connect(self.onSuccess)
         self.failed.connect(self.onFailed)
+
+    @Property(float, notify=minimizerTolChanged)
+    def minimizerTol(self):
+        return self._minimizerTol
+
+    @minimizerTol.setter
+    def minimizerTol(self, newValue):
+        if self._minimizerTol != newValue and 0 < newValue <= 1e3 and not np.isnan(newValue):
+            self._minimizerTol = newValue
+            self.minimizerTolChanged.emit()
+
+    @Property(float, notify=minimizerMaxIterChanged)
+    def minimizerMaxIter(self):
+        return self._minimizerMaxIter
+
+    @minimizerMaxIter.setter
+    def minimizerMaxIter(self, newValue):
+        if self._minimizerMaxIter != newValue and 0 < newValue and not np.isnan(newValue):
+            self._minimizerMaxIter = newValue
+            self.minimizerMaxIterChanged.emit()
 
     def fit_nonpolar(self, *args):
         method = self._current_minimizer_method_name
@@ -82,6 +106,8 @@ class Fitting(QObject):
         self.interface._InterfaceFactoryTemplate__interface_obj._iteration = 0
         self.fitStarted.emit()
 
+        # This is currently only set up for LMFit.
+        # Needs to be updated for other engines
         kwargs = {'method': method}
 
         # add the bridge info from args
@@ -90,6 +116,13 @@ class Fitting(QObject):
 
         if method == 'least_squares':
             kwargs['minimizer_kwargs'] = {'diff_step': 1e-5}
+
+        # if 'minimizer_kwargs' not in kwargs:
+        #     kwargs['minimizer_kwargs'] = {}
+        # kwargs['minimizer_kwargs']['ftol'] = self.minimizerTol
+        # kwargs['minimizer_kwargs']['xtol'] = self.minimizerTol
+        self.fitter.tolerance = self.minimizerTol
+        self.fitter.max_evaluations = self.minimizerMaxIter
 
         try:
             self.parent.job.fit(**kwargs)
@@ -182,7 +215,8 @@ class Fitting(QObject):
     def resetAll(self):
         self.resetErrors()
         self._fit_results = _defaultFitResults()
-        self.fitter = CoreFitter(self.parent.experiment.job, self.interface.fit_func)
+        # self.fitter = CoreFitter(self.parent.experiment.job, self.interface.fit_func)
+        self.fitter = self.parent.model.job.analysis._fitter
 
     def resetErrors(self):
         # Reset all errors to zero
