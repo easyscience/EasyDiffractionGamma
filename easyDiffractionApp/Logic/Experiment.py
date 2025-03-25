@@ -1233,8 +1233,12 @@ class Experiment(QObject):
         p_name = BLOCK2JOB[name]
         p_category = BLOCK2JOB[category]
         # get category
-        # assumption of the first loop, since there is only one background currently
-        job_with_category = getattr(self._job, p_category)[rowIndex]
+        if 'background' in category:
+            # this is the case of the background
+             job_with_category = getattr(self._job, p_category)[0]
+        else:
+            # works for atom loops
+            job_with_category = getattr(self._job, p_category)[rowIndex]
         # should we get the loop item?
         # this works for the background, but not for scale etc.
         try:

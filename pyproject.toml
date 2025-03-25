@@ -8,9 +8,12 @@ build-backend = "hatchling.build"
 # Note that while the project is called EasyDiffractionApp
 # the application itself is EasyDiffraction.
 name = 'easyDiffractionApp'
-version = '0.9.5'
+version = '0.10.0'
 description = 'Making diffraction data analysis and modelling easy.'
-authors = [{ name = "Andrew Sazonov", email = "andrew.sazonov@ess.eu" }]
+authors = [
+  { name = "Andrew Sazonov", email = "andrew.sazonov@ess.eu" },
+  { name = "Piotr Rozyczko", email = "piotr.rozyczko@ess.eu" },
+]
 maintainers = [{ name = "Andrew Sazonov", email = "andrew.sazonov@ess.eu" }]
 license = { file = "LICENSE.md" }
 classifiers = [
