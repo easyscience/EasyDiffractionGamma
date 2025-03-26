@@ -1657,7 +1657,7 @@ class Experiment(QObject):
 
     def runProfileCalculations(self):
         # shove it all into the calculator.
-        _ = self._job.calculate_profile()  # this fills out calculator _inOutDict
+        _ = self._job.calculate_profile()
         console.debug(formatMsg('sub', 'Profle calculations', 'finished'))
 
         pass
@@ -1687,7 +1687,6 @@ class Experiment(QObject):
         self.setYMeasArray(y_meas_array, idx)
 
         # Standard deviation of the measured Y data
-        # sy_meas_array = calcInOutDict[calc_block_name]['signal_exp'][1]
         sy_meas_array = self._job.experiment.e.values
         self.setSYMeasArray(sy_meas_array, idx)
 

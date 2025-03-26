@@ -186,7 +186,6 @@ class Plotting(QObject):
     # Backend private methods
 
     # QtCharts: Experiment
-
     def qtchartsReplaceMeasuredOnExperimentChartAndRedraw(self):
         index = self._proxy.experiment.currentIndex
         try:
