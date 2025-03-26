@@ -1235,7 +1235,7 @@ class Experiment(QObject):
         # get category
         if 'background' in category:
             # this is the case of the background
-             job_with_category = getattr(self._job, p_category)[0]
+            job_with_category = getattr(self._job, p_category)[0]
         else:
             # works for atom loops
             job_with_category = getattr(self._job, p_category)[rowIndex]
@@ -1657,26 +1657,9 @@ class Experiment(QObject):
 
     def runProfileCalculations(self):
         # shove it all into the calculator.
-        # result = self._interface.calculate_profile()
-
-        # console.debug(formatMsg('sub', 'Profle calculations', 'finished'))
-
-        # chiSq = result[0]
-        # self._proxy.fitting._pointsCount = result[1]
-        # self._proxy.fitting._freeParamsCount = len(result[4])
-        # self._proxy.fitting.chiSq = chiSq / (self._proxy.fitting._pointsCount - self._proxy.fitting._freeParamsCount)
-
-        # gofLastIter = self._proxy.fitting.chiSq  # NEED FIX
-
         _ = self._job.calculate_profile()  # this fills out calculator _inOutDict
+        console.debug(formatMsg('sub', 'Profle calculations', 'finished'))
 
-        # if self._proxy.fitting.chiSqStart is None:
-        #     self._proxy.status.goodnessOfFit = f'{gofLastIter:0.2f}'                           # NEED move to connection
-        # else:
-        #     gofStart = self._proxy.fitting.chiSqStart # NEED FIX
-        #     self._proxy.status.goodnessOfFit = f'{gofStart:0.2f} → {gofLastIter:0.2f}'  # NEED move to connection
-        # if not self._proxy.fitting._freezeChiSqStart:
-        #     self._proxy.fitting.chiSqStart = self._proxy.fitting.chiSq
         pass
 
     def setMeasuredArraysForSingleExperiment(self, idx):
