@@ -228,6 +228,8 @@ class Plotting(QObject):
         index = self._proxy.experiment.currentIndex
         try:
             xArray = self._proxy.experiment._xArrays[index]
+            offset = self._proxy.job.pattern.zero_shift.value
+            xArray = xArray - offset
             yBkgArray = self._proxy.experiment._yBkgArrays[index]
         except IndexError:
             xArray = np.empty(0)
@@ -240,6 +242,8 @@ class Plotting(QObject):
         index = self._proxy.experiment.currentIndex
         try:
             xArray = self._proxy.experiment._xArrays[index]
+            offset = self._proxy.job.pattern.zero_shift.value
+            xArray = xArray - offset
             yCalcTotalArray = self._proxy.experiment._yCalcTotalArrays[index]
         except IndexError:
             xArray = np.empty(0)
