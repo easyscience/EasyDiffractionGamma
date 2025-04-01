@@ -8,7 +8,7 @@ _cell.angle_beta 90.0
 _cell.angle_gamma 90.0
 
 _space_group.name_H-M_alt "P n m a"
-_space_group.IT_coordinate_system_code abc
+_space_group.IT_coordinate_system_code cab
 
 loop_
 _atom_site.label
