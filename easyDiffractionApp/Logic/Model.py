@@ -614,7 +614,11 @@ class Model(QObject):
         if not self.defined:
             self._currentIndex = -1
 
-        # self.dataBlocksChanged.emit()
+        if index == self.currentIndex:
+            # zero out the index if we deleted the current one
+            self.currentIndex = 0
+
+        self.dataBlocksChanged.emit()
         console.debug(f'Model no. {index + 1} has been removed')
 
     @Slot()
