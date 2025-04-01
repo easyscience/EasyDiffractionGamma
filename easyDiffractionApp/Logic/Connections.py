@@ -111,6 +111,7 @@ class Connections(QObject):
         # Analysis page
         if self._proxy.analysis.defined:
             console.debug(formatMsg('main', f'Redrawing curves on analysis page using {self._proxy.plotting.currentLib1d}...'))
+            self._proxy.plotting.drawBackgroundOnAnalysisChart()
             self._proxy.plotting.drawCalculatedOnAnalysisChart()
             self._proxy.plotting.drawResidualOnAnalysisChart()
             self._proxy.plotting.drawBraggOnAnalysisChart()
@@ -233,6 +234,7 @@ class Connections(QObject):
         console.debug(formatMsg('main', f'Drawing curves on analysis page using {self._proxy.plotting.currentLib1d}...'))
         self._proxy.plotting.drawMeasuredOnAnalysisChart()
         self._proxy.plotting.drawBackgroundOnExperimentChart()
+        self._proxy.plotting.drawBackgroundOnAnalysisChart()
         self._proxy.plotting.drawCalculatedOnAnalysisChart()
         self._proxy.plotting.drawResidualOnAnalysisChart()
         self._proxy.plotting.drawBraggOnAnalysisChart()

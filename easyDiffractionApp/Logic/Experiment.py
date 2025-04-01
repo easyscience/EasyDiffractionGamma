@@ -1734,7 +1734,7 @@ class Experiment(QObject):
         modelNames = [key[12:] for key in calcInOutDict[calc_block_name].keys() if 'dict_in_out' in key]
         xBraggDict = {}
         for modelName in modelNames:
-            hkl_string = f'{modelName}_hkl'
+            hkl_string = 'ttheta_hkl' if diffrn_radiation_type == 'cwl' else 'time_hkl'
             if hkl_string not in calcInOutDict[calc_block_name][f'dict_in_out_{modelName}']:
                 continue
             x_bragg_array = calcInOutDict[calc_block_name][f'dict_in_out_{modelName}'][hkl_string]
