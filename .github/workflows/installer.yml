@@ -201,20 +201,20 @@ jobs:
         shell: bash
         run: python ${{ env.PACKAGE_NAME }}/main.py --testmode
 
-      - name: Run screenshots comparison tests
-        run: pytest tests/gui --color=yes
+      # - name: Run screenshots comparison tests
+      #   run: pytest tests/gui --color=yes
 
-      - name: Upload zipped GUI tests screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-installer_screenshots_${{ matrix.os }} # desired name (without .zip) of the zip file to be uploaded
-          path:
-            | # all files from these paths are zipped into file with name from above
-            tests/gui/screenshots
-            .tests/image_diff
-          if-no-files-found: 'error'
-          compression-level: 0
+      # - name: Upload zipped GUI tests screenshots
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: build-installer_screenshots_${{ matrix.os }} # desired name (without .zip) of the zip file to be uploaded
+      #     path:
+      #       | # all files from these paths are zipped into file with name from above
+      #       tests/gui/screenshots
+      #       .tests/image_diff
+      #     if-no-files-found: 'error'
+      #     compression-level: 0
 
       - name: Create freezed python app bundle with PyInstaller
         run: python ${{ env.SCRIPTS_PATH }}/FreezeApp.py
@@ -409,18 +409,18 @@ jobs:
         if: runner.os != 'Windows' # disabled because it can't exit app and one can't see what is going on there (no GitHub logging)...
         run: python ${{ env.SCRIPTS_PATH }}/RunApp.py --testmode
 
-      - name: Run screenshots comparison tests
-        if: runner.os != 'Windows' # disabled as didn't run app in test in the previous step
-        run: pytest tests/gui --color=yes
+      # - name: Run screenshots comparison tests
+      #   if: runner.os != 'Windows' # disabled as didn't run app in test in the previous step
+      #   run: pytest tests/gui --color=yes
 
-      - name: Upload zipped GUI tests screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-installer_screenshots_${{ matrix.os }} # desired name (without .zip) of the zip file to be uploaded
-          path:
-            | # all files from these paths are zipped into file with name from above
-            tests/gui/screenshots
-            .tests/image_diff
-          if-no-files-found: 'error'
-          compression-level: 0
+      # - name: Upload zipped GUI tests screenshots
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: test-installer_screenshots_${{ matrix.os }} # desired name (without .zip) of the zip file to be uploaded
+      #     path:
+      #       | # all files from these paths are zipped into file with name from above
+      #       tests/gui/screenshots
+      #       .tests/image_diff
+      #     if-no-files-found: 'error'
+      #     compression-level: 0

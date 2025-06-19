@@ -37,7 +37,7 @@ dependencies = [
   'funcy',
   'cryspy',
   'EasyApp @ git+https://github.com/easyscience/EasyApp.git@develop',
-  'easyDiffraction @ git+https://github.com/easyscience/EasyDiffractionLib.git@new_param',
+  'easyDiffraction',
 ]
 
 [project.optional-dependencies]
