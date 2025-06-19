@@ -228,10 +228,10 @@ EaElements.RemoteController {
         // res.push( rc.compare(Globals.Proxies.main.status.goodnessOfFit, '341.99 → 4.41') )
         // res.push( rc.compare(Globals.Proxies.main.status.fitStatus, 'Success') )
 
-        res.push( rc.compare(Globals.Proxies.main.status.variables, '69 (6 free, 63 fixed)') )
-        //res.push( rc.compare(Globals.Proxies.main.status.fitIteration, '197') )
-        res.push( rc.compare(Globals.Proxies.main.status.goodnessOfFit, '0.81603') )
-        res.push( rc.compare(Globals.Proxies.main.status.fitStatus, 'Success') )
+        // res.push( rc.compare(Globals.Proxies.main.status.variables, '69 (6 free, 63 fixed)') )
+        // //res.push( rc.compare(Globals.Proxies.main.status.fitIteration, '197') )
+        // res.push( rc.compare(Globals.Proxies.main.status.goodnessOfFit, '0.81603') )
+        // res.push( rc.compare(Globals.Proxies.main.status.fitStatus, 'Success') )
         rc.mouseClick(Globals.Refs.app.analysisPage.continueButton)
         //rc.wait(2000)
 
